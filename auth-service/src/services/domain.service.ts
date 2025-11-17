@@ -2,7 +2,14 @@ import { query, getClient } from '../config/database';
 import { Domain } from '../types';
 
 export class DomainService {
-  async list(): Promise<Domain[]> {
+  async list(organizationId?: string): Promise<Domain[]> {
+    if (organizationId) {
+      const result = await query(
+        'SELECT * FROM domains WHERE organization_id = $1 ORDER BY created_at DESC',
+        [organizationId]
+      );
+      return result.rows;
+    }
     const result = await query('SELECT * FROM domains ORDER BY created_at DESC');
     return result.rows;
   }
@@ -23,6 +30,7 @@ export class DomainService {
   }
 
   async create(data: {
+    organization_id: string;
     name: string;
     slug: string;
     domain: string;
@@ -31,10 +39,11 @@ export class DomainService {
     settings?: Record<string, any>;
   }): Promise<Domain> {
     const result = await query(
-      `INSERT INTO domains (name, slug, domain, description, logo_url, settings)
-       VALUES ($1, $2, $3, $4, $5, $6)
+      `INSERT INTO domains (organization_id, name, slug, domain, description, logo_url, settings)
+       VALUES ($1, $2, $3, $4, $5, $6, $7)
        RETURNING *`,
       [
+        data.organization_id,
         data.name,
         data.slug,
         data.domain,
@@ -134,6 +143,26 @@ export class DomainService {
       [domainId]
     );
     return result.rows[0];
+  }
+
+  async getByOrganization(organizationId: string): Promise<Domain[]> {
+    const result = await query(
+      `SELECT d.*,
+        (SELECT COUNT(*) FROM tenants WHERE domain_id = d.id AND is_active = true) as tenant_count
+       FROM domains d
+       WHERE d.organization_id = $1 AND d.is_active = true
+       ORDER BY d.created_at DESC`,
+      [organizationId]
+    );
+    return result.rows;
+  }
+
+  async countByOrganization(organizationId: string): Promise<number> {
+    const result = await query(
+      'SELECT COUNT(*) as count FROM domains WHERE organization_id = $1 AND is_active = true',
+      [organizationId]
+    );
+    return parseInt(result.rows[0].count);
   }
 }
 

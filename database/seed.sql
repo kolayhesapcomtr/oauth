@@ -2,15 +2,67 @@
 -- SEED DATA FOR TESTING
 -- ============================================
 
--- Password: Admin123! (hashed with bcrypt rounds=10)
+-- Password: Test123! (hashed with bcrypt rounds=10)
 -- bcrypt hash: $2a$10$rGHnGqXNJd8qZ5t5j3F0dO0eJKZqgXz1VqYcYXYqZ3J0F0dO0eJKZ
 
 -- ============================================
--- 1. INSERT DOMAINS
+-- 1. INSERT ORGANIZATIONS (SaaS Platform Customers)
 -- ============================================
-INSERT INTO domains (id, name, slug, domain, description) VALUES
-('d1111111-1111-1111-1111-111111111111', 'CRM System', 'crm', 'crm.localhost:3001', 'Customer Relationship Management System'),
-('d2222222-2222-2222-2222-222222222222', 'Analytics Platform', 'analytics', 'analytics.localhost:3002', 'Advanced Analytics and Reporting Platform');
+INSERT INTO organizations (
+  id,
+  name,
+  slug,
+  owner_email,
+  billing_email,
+  plan,
+  status,
+  max_domains,
+  max_tenants,
+  max_users,
+  max_api_calls_per_month,
+  max_storage_gb,
+  features,
+  trial_ends_at
+) VALUES
+(
+  'org11111-1111-1111-1111-111111111111',
+  'Test Organization',
+  'test-org',
+  'admin@example.com',
+  'billing@example.com',
+  'business',
+  'active',
+  10,
+  200,
+  10000,
+  1000000,
+  100,
+  '{"email_support": true, "api_access": true, "custom_domain": true, "sso": true, "priority_support": true}'::jsonb,
+  NULL
+),
+(
+  'org22222-2222-2222-2222-222222222222',
+  'Demo Startup Inc',
+  'demo-startup',
+  'contact@demostartup.com',
+  'contact@demostartup.com',
+  'trial',
+  'trial',
+  1,
+  10,
+  100,
+  10000,
+  1,
+  '{"email_support": true, "api_access": true}'::jsonb,
+  CURRENT_TIMESTAMP + INTERVAL '14 days'
+);
+
+-- ============================================
+-- 2. INSERT DOMAINS
+-- ============================================
+INSERT INTO domains (id, organization_id, name, slug, domain, description) VALUES
+('d1111111-1111-1111-1111-111111111111', 'org11111-1111-1111-1111-111111111111', 'CRM System', 'crm', 'crm.localhost:3001', 'Customer Relationship Management System'),
+('d2222222-2222-2222-2222-222222222222', 'org11111-1111-1111-1111-111111111111', 'Analytics Platform', 'analytics', 'analytics.localhost:3002', 'Advanced Analytics and Reporting Platform');
 
 -- ============================================
 -- 2. INSERT ROLES FOR CRM DOMAIN
@@ -130,11 +182,11 @@ INSERT INTO tenants (id, domain_id, name, slug, description) VALUES
 -- ============================================
 -- NOTE: All passwords are: Test123!
 -- Hash generated with: bcryptjs.hashSync('Test123!', 10)
-INSERT INTO users (id, email, password_hash, first_name, last_name, is_email_verified) VALUES
-('u0000000-0000-0000-0000-000000000001', 'ahmet@example.com', '$2a$10$rGHnGqXNJd8qZ5t5j3F0dO0eJKZqgXz1VqYcYXYqZ3J0F0dO0eJKZ', 'Ahmet', 'Yılmaz', true),
-('u0000000-0000-0000-0000-000000000002', 'mehmet@example.com', '$2a$10$rGHnGqXNJd8qZ5t5j3F0dO0eJKZqgXz1VqYcYXYqZ3J0F0dO0eJKZ', 'Mehmet', 'Demir', true),
-('u0000000-0000-0000-0000-000000000003', 'ayse@example.com', '$2a$10$rGHnGqXNJd8qZ5t5j3F0dO0eJKZqgXz1VqYcYXYqZ3J0F0dO0eJKZ', 'Ayşe', 'Kaya', true),
-('u0000000-0000-0000-0000-000000000004', 'admin@example.com', '$2a$10$rGHnGqXNJd8qZ5t5j3F0dO0eJKZ', 'System', 'Admin', true);
+INSERT INTO users (id, email, password_hash, first_name, last_name, is_email_verified, organization_id, is_super_admin) VALUES
+('u0000000-0000-0000-0000-000000000001', 'ahmet@example.com', '$2a$10$rGHnGqXNJd8qZ5t5j3F0dO0eJKZqgXz1VqYcYXYqZ3J0F0dO0eJKZ', 'Ahmet', 'Yılmaz', true, 'org11111-1111-1111-1111-111111111111', false),
+('u0000000-0000-0000-0000-000000000002', 'mehmet@example.com', '$2a$10$rGHnGqXNJd8qZ5t5j3F0dO0eJKZqgXz1VqYcYXYqZ3J0F0dO0eJKZ', 'Mehmet', 'Demir', true, 'org11111-1111-1111-1111-111111111111', false),
+('u0000000-0000-0000-0000-000000000003', 'ayse@example.com', '$2a$10$rGHnGqXNJd8qZ5t5j3F0dO0eJKZqgXz1VqYcYXYqZ3J0F0dO0eJKZ', 'Ayşe', 'Kaya', true, 'org11111-1111-1111-1111-111111111111', false),
+('u0000000-0000-0000-0000-000000000004', 'admin@example.com', '$2a$10$rGHnGqXNJd8qZ5t5j3F0dO0eJKZqgXz1VqYcYXYqZ3J0F0dO0eJKZ', 'System', 'Admin', true, 'org11111-1111-1111-1111-111111111111', true);
 
 -- ============================================
 -- 10. ASSIGN USERS TO TENANTS WITH ROLES
