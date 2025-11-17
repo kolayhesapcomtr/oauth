@@ -2,182 +2,123 @@ import { Request, Response } from 'express';
 import domainService from '../services/domain.service';
 import { AuthRequest } from '../middleware/auth.middleware';
 
-class DomainController {
-  /**
-   * Create new domain
-   * POST /api/domains
-   */
-  async createDomain(req: Request, res: Response) {
+export class DomainController {
+  async list(req: Request, res: Response) {
     try {
-      const authReq = req as AuthRequest;
-      const { name, domain, description, logo_url, settings } = req.body;
+      const domains = await domainService.list();
+      res.json({ domains });
+    } catch (error: any) {
+      console.error('List domains error:', error);
+      res.status(500).json({ error: 'Failed to list domains' });
+    }
+  }
 
-      if (!name || !domain) {
-        return res.status(400).json({
-          success: false,
-          message: 'Name and domain are required'
-        });
+  async getById(req: Request, res: Response) {
+    try {
+      const { id } = req.params;
+      const domain = await domainService.findById(id);
+
+      if (!domain) {
+        return res.status(404).json({ error: 'Domain not found' });
       }
 
-      // Validate domain format
-      const domainRegex = /^[a-zA-Z0-9][a-zA-Z0-9-]{0,61}[a-zA-Z0-9]?\.[a-zA-Z]{2,}$/;
-      if (!domainRegex.test(domain)) {
-        return res.status(400).json({
-          success: false,
-          message: 'Invalid domain format'
-        });
+      res.json({ domain });
+    } catch (error: any) {
+      console.error('Get domain error:', error);
+      res.status(500).json({ error: 'Failed to get domain' });
+    }
+  }
+
+  async getStats(req: Request, res: Response) {
+    try {
+      const { id } = req.params;
+      const domain = await domainService.findById(id);
+
+      if (!domain) {
+        return res.status(404).json({ error: 'Domain not found' });
       }
 
-      const newDomain = await domainService.createDomain({
-        organization_id: authReq.user!.organization_id!,
+      const stats = await domainService.getDomainStats(id);
+      res.json({ domain, stats });
+    } catch (error: any) {
+      console.error('Get domain stats error:', error);
+      res.status(500).json({ error: 'Failed to get domain stats' });
+    }
+  }
+
+  async create(req: Request, res: Response) {
+    try {
+      const { name, slug, domain, description, logo_url, settings } = req.body;
+
+      // Check if domain or slug already exists
+      const existingDomain = await domainService.findBySlug(slug);
+      if (existingDomain) {
+        return res.status(409).json({ error: 'Domain slug already exists' });
+      }
+
+      const existingUrl = await domainService.findByDomain(domain);
+      if (existingUrl) {
+        return res.status(409).json({ error: 'Domain URL already exists' });
+      }
+
+      const newDomain = await domainService.create({
         name,
+        slug,
         domain,
         description,
         logo_url,
-        settings
+        settings,
       });
 
       res.status(201).json({
-        success: true,
         message: 'Domain created successfully',
-        data: newDomain
+        domain: newDomain,
       });
     } catch (error: any) {
       console.error('Create domain error:', error);
-      res.status(400).json({
-        success: false,
-        message: error.message || 'Failed to create domain'
-      });
+      res.status(500).json({ error: 'Failed to create domain' });
     }
   }
 
-  /**
-   * Get domain by ID
-   * GET /api/domains/:id
-   */
-  async getDomain(req: Request, res: Response) {
+  async update(req: Request, res: Response) {
     try {
       const { id } = req.params;
+      const { name, slug, domain, description, logo_url, is_active, settings } = req.body;
 
-      const domain = await domainService.getDomainById(id);
-
-      if (!domain) {
-        return res.status(404).json({
-          success: false,
-          message: 'Domain not found'
-        });
-      }
-
-      res.json({
-        success: true,
-        data: domain
-      });
-    } catch (error: any) {
-      console.error('Get domain error:', error);
-      res.status(500).json({
-        success: false,
-        message: 'Failed to get domain'
-      });
-    }
-  }
-
-  /**
-   * Get domains for organization
-   * GET /api/domains
-   */
-  async getDomains(req: Request, res: Response) {
-    try {
-      const authReq = req as AuthRequest;
-      const organizationId = authReq.user!.organization_id!;
-
-      const domains = await domainService.getDomainsByOrganization(organizationId);
-
-      res.json({
-        success: true,
-        data: domains
-      });
-    } catch (error: any) {
-      console.error('Get domains error:', error);
-      res.status(500).json({
-        success: false,
-        message: 'Failed to get domains'
-      });
-    }
-  }
-
-  /**
-   * Update domain
-   * PUT /api/domains/:id
-   */
-  async updateDomain(req: Request, res: Response) {
-    try {
-      const { id } = req.params;
-      const { name, description, logo_url, settings } = req.body;
-
-      const domain = await domainService.updateDomain(id, {
+      const updatedDomain = await domainService.update(id, {
         name,
+        slug,
+        domain,
         description,
         logo_url,
-        settings
+        is_active,
+        settings,
       });
 
       res.json({
-        success: true,
         message: 'Domain updated successfully',
-        data: domain
+        domain: updatedDomain,
       });
     } catch (error: any) {
+      if (error.message === 'Domain not found') {
+        return res.status(404).json({ error: error.message });
+      }
       console.error('Update domain error:', error);
-      res.status(400).json({
-        success: false,
-        message: error.message || 'Failed to update domain'
-      });
+      res.status(500).json({ error: 'Failed to update domain' });
     }
   }
 
-  /**
-   * Delete domain
-   * DELETE /api/domains/:id
-   */
-  async deleteDomain(req: Request, res: Response) {
+  async delete(req: Request, res: Response) {
     try {
       const { id } = req.params;
-
-      await domainService.deleteDomain(id);
-
-      res.json({
-        success: true,
-        message: 'Domain deleted successfully'
-      });
+      await domainService.delete(id);
+      res.json({ message: 'Domain deleted successfully' });
     } catch (error: any) {
+      if (error.message === 'Domain not found') {
+        return res.status(404).json({ error: error.message });
+      }
       console.error('Delete domain error:', error);
-      res.status(400).json({
-        success: false,
-        message: error.message || 'Failed to delete domain'
-      });
-    }
-  }
-
-  /**
-   * Get domain statistics
-   * GET /api/domains/:id/stats
-   */
-  async getDomainStats(req: Request, res: Response) {
-    try {
-      const { id } = req.params;
-
-      const stats = await domainService.getDomainStats(id);
-
-      res.json({
-        success: true,
-        data: stats
-      });
-    } catch (error: any) {
-      console.error('Get domain stats error:', error);
-      res.status(500).json({
-        success: false,
-        message: 'Failed to get domain statistics'
-      });
+      res.status(500).json({ error: 'Failed to delete domain' });
     }
   }
 }

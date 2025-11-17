@@ -1,385 +1,455 @@
-# 🔐 Multi-Tenant SaaS Authentication Platform
+# Multi-Domain Multi-Tenant Auth System
 
-Enterprise-grade multi-domain multi-tenant authentication and authorization system that you can sell as a service (SaaS).
+Enterprise-grade authentication and authorization system supporting multiple SaaS applications with organization-based multi-tenancy and role-based access control (RBAC).
 
-## 🌟 Overview
+## 🎯 Features
 
-This is a **Multi-Tenant SaaS Platform** (Model 2 - "Inception" Architecture) where you provide authentication, role management, and subscription services to other companies.
+- **Multi-Domain Support**: Single auth service for multiple SaaS products
+- **Multi-Tenancy**: Organization-based tenant isolation
+- **RBAC**: Fine-grained role and permission system
+- **JWT Authentication**: Stateless authentication with refresh tokens
+- **Context Switching**: Users can switch between tenants seamlessly
+- **SSO Ready**: Single sign-on across all your applications
+- **Audit Logging**: Complete audit trail of all actions
+- **Type-Safe**: Built with TypeScript
 
-### Architecture Hierarchy
-
-```
-🏢 Organizations (Your Customers)
-  └── 🌐 Domains (Their SaaS Applications)
-      └── 🏛️ Tenants (Their Customers/Clients)
-          └── 👥 Users (End Users)
-              └── 🔑 Roles & Permissions
-```
-
-### Example Use Case
-
-**Your Customer:** TechCorp Inc. (subscribed to your auth service)
-- **Domain 1:** crm.techcorp.com (their CRM application)
-  - **Tenant 1:** Acme Corp (one of their clients)
-    - Users: John, Jane, Bob
-  - **Tenant 2:** XYZ Ltd
-    - Users: Alice, Charlie
-- **Domain 2:** analytics.techcorp.com (their Analytics application)
-  - **Tenant 1:** Acme Corp
-    - Users: John, Jane
-
-## 🎯 Key Features
-
-### 1. **Organization Management (SaaS)**
-- ✅ Multi-organization support (your customers)
-- ✅ Subscription plans (Trial, Starter, Business, Enterprise)
-- ✅ Usage-based limits (domains, tenants, users, API calls)
-- ✅ Automatic limit enforcement
-- ✅ Overage tracking and billing
-
-### 2. **Multi-Domain Multi-Tenant**
-- ✅ Each organization can have multiple domains (applications)
-- ✅ Each domain can have multiple tenants (clients)
-- ✅ Complete data isolation between organizations and tenants
-- ✅ Domain-aware authentication
-
-### 3. **Advanced RBAC**
-- ✅ Granular role and permission system
-- ✅ Cross-domain and cross-tenant access
-- ✅ Permission inheritance and composition
-
-### 4. **Usage Tracking & Analytics**
-- ✅ Real-time API usage tracking
-- ✅ Monthly usage reports
-- ✅ API endpoint analytics
-- ✅ Error rate monitoring
-- ✅ Performance metrics
-- ✅ Audit logs
-
-### 5. **Plan Limits & Enforcement**
-- ✅ Automatic limit checking before operations
-- ✅ Soft limits with upgrade prompts
-- ✅ Hard limits with subscription enforcement
-- ✅ Feature flags per plan
-
-### 6. **Rate Limiting**
-- ✅ Organization-based rate limiting
-- ✅ Configurable limits per plan
-- ✅ Usage headers in API responses
-
-## 📊 Subscription Plans
-
-| Feature | Trial | Starter | Business | Enterprise |
-|---------|-------|---------|----------|------------|
-| **Price** | Free (14 days) | $299/mo | $999/mo | Custom |
-| **Domains** | 1 | 3 | 10 | Unlimited |
-| **Tenants** | 10 | 50 | 200 | Unlimited |
-| **Users** | 100 | 1,000 | 10,000 | Unlimited |
-| **API Calls/Month** | 10,000 | 100,000 | 1,000,000 | Unlimited |
-| **Storage** | 1 GB | 10 GB | 100 GB | Unlimited |
-| **Email Support** | ✅ | ✅ | ✅ | ✅ |
-| **API Access** | ✅ | ✅ | ✅ | ✅ |
-| **Custom Domain** | ❌ | ❌ | ✅ | ✅ |
-| **SSO** | ❌ | ❌ | ✅ | ✅ |
-| **White Label** | ❌ | ❌ | ❌ | ✅ |
-| **Priority Support** | ❌ | ❌ | ✅ | ✅ |
-| **SLA** | - | - | 99.9% | 99.99% |
-
-## 🏗️ Tech Stack
-
-- **Backend:** Node.js + TypeScript + Express
-- **Database:** PostgreSQL
-- **Authentication:** JWT (Access + Refresh Tokens)
-- **Payment:** Stripe (ready for integration)
-- **API Style:** RESTful
-
-## 📁 Project Structure
+## 🏗️ Architecture
 
 ```
-oauth/
-├── database/
-│   ├── schema.sql                  # Core auth schema
-│   ├── organization-schema.sql     # Organization/SaaS layer
-│   └── seed.sql                    # Test data
-│
-├── auth-service/
-│   ├── src/
-│   │   ├── config/
-│   │   │   └── database.ts
-│   │   │
-│   │   ├── middleware/
-│   │   │   ├── auth.middleware.ts              # JWT auth
-│   │   │   ├── limit-enforcement.middleware.ts # Plan limits
-│   │   │   └── usage-tracking.middleware.ts    # Usage logging
-│   │   │
-│   │   ├── services/
-│   │   │   ├── organization.service.ts         # Organization CRUD
-│   │   │   ├── domain.service.ts               # Domain management
-│   │   │   └── analytics.service.ts            # Usage analytics
-│   │   │
-│   │   ├── controllers/
-│   │   │   ├── organization.controller.ts
-│   │   │   ├── domain.controller.ts
-│   │   │   └── analytics.controller.ts
-│   │   │
-│   │   ├── routes/
-│   │   │   ├── organization.routes.ts
-│   │   │   ├── domain.routes.ts
-│   │   │   ├── analytics.routes.ts
-│   │   │   └── index.ts
-│   │   │
-│   │   └── index.ts                            # Main server
-│   │
-│   ├── package.json
-│   └── tsconfig.json
-│
-└── README.md
+┌─────────────────────────────────────────┐
+│   Auth Service (auth.yourdomain.com)    │
+│                                         │
+│  ├── OAuth 2.0 / JWT                   │
+│  ├── User Management                   │
+│  ├── Role & Permission Management      │
+│  └── Multi-Tenant Context              │
+└─────────────────────────────────────────┘
+            │
+            │ JWT Tokens
+            ▼
+┌───────────────────────────────────────────┐
+│         Your Applications                 │
+│                                           │
+│  CRM (crm.com)        Analytics           │
+│  ├── Firma A          ├── Firma C        │
+│  └── Firma B          └── Firma D        │
+└───────────────────────────────────────────┘
 ```
 
-## 🚀 Getting Started
+## 📊 Data Hierarchy
+
+```
+User (Global)
+ │
+ ├── Domain 1 (CRM)
+ │   ├── Tenant A (Firma A)
+ │   │   └── Role: Admin
+ │   └── Tenant B (Firma B)
+ │       └── Role: Sales
+ │
+ └── Domain 2 (Analytics)
+     └── Tenant C (Firma C)
+         └── Role: Viewer
+```
+
+## 🚀 Quick Start
 
 ### Prerequisites
 
 - Node.js 18+
 - PostgreSQL 14+
-- npm or yarn
+- Docker & Docker Compose (optional)
 
-### Installation
-
-1. **Clone the repository**
+### 1. Installation
 
 ```bash
-git clone <repository-url>
+# Clone repository
+git clone <repo-url>
 cd oauth
-```
 
-2. **Install dependencies**
-
-```bash
-cd auth-service
+# Install dependencies
 npm install
+cd auth-service && npm install
 ```
 
-3. **Setup environment variables**
+### 2. Setup Database
+
+#### Using Docker Compose (Recommended)
 
 ```bash
-cp .env.example .env
+# Start PostgreSQL
+docker-compose up -d postgres
+
+# Wait for PostgreSQL to be ready
+sleep 5
+
+# Create database and run migrations
+npm run db:setup
 ```
 
-Edit `.env` with your configuration:
-
-```env
-# Database
-DB_HOST=localhost
-DB_PORT=5432
-DB_NAME=oauth_db
-DB_USER=postgres
-DB_PASSWORD=your-password
-
-# JWT
-JWT_SECRET=your-super-secret-key
-JWT_REFRESH_SECRET=your-refresh-secret-key
-
-# Server
-PORT=3000
-NODE_ENV=development
-```
-
-4. **Setup database**
+#### Manual Setup
 
 ```bash
 # Create database
-createdb oauth_db
+createdb auth_system
 
-# Run migrations
-psql oauth_db < ../database/schema.sql
-psql oauth_db < ../database/organization-schema.sql
+# Run schema
+psql -d auth_system -f database/schema.sql
 
-# (Optional) Load test data
-psql oauth_db < ../database/seed.sql
+# Run seed data (optional, for testing)
+psql -d auth_system -f database/seed.sql
 ```
 
-5. **Start the server**
+### 3. Environment Configuration
 
 ```bash
-# Development
-npm run dev
+# Copy example environment
+cp auth-service/.env.example auth-service/.env
 
-# Production
-npm run build
-npm start
+# Edit .env file with your settings
+nano auth-service/.env
 ```
 
-The API will be available at `http://localhost:3000`
+### 4. Start Development Server
 
-## 📚 API Documentation
+```bash
+# From auth-service directory
+cd auth-service
+npm run dev
+
+# Or from root
+npm run dev:auth
+```
+
+Server will start on `http://localhost:3000`
+
+## 📡 API Endpoints
 
 ### Authentication
 
-All protected endpoints require a Bearer token:
+#### Register
+```http
+POST /api/auth/register
+Content-Type: application/json
 
-```
-Authorization: Bearer <your-jwt-token>
-```
-
-### Core Endpoints
-
-#### **Organizations**
-
-```
-POST   /api/organizations              # Create organization (signup)
-GET    /api/organizations              # List all organizations (super admin)
-GET    /api/organizations/:id          # Get organization details
-PUT    /api/organizations/:id          # Update organization
-GET    /api/organizations/:id/usage    # Get current usage
-GET    /api/organizations/:id/stats    # Get detailed statistics
-PUT    /api/organizations/:id/plan     # Change subscription plan
-DELETE /api/organizations/:id          # Deactivate organization
-
-GET    /api/organizations/plans        # Get all available plans
-GET    /api/organizations/slug/:slug   # Get organization by slug
-```
-
-#### **Domains**
-
-```
-POST   /api/domains                    # Create domain (with limit check)
-GET    /api/domains                    # Get all domains for organization
-GET    /api/domains/:id                # Get domain details
-PUT    /api/domains/:id                # Update domain
-DELETE /api/domains/:id                # Delete domain
-GET    /api/domains/:id/stats          # Get domain statistics
-```
-
-#### **Analytics**
-
-```
-# Usage Reports
-GET    /api/analytics/usage/monthly              # Monthly usage report
-GET    /api/analytics/usage/trend                # Usage trend (last N months)
-GET    /api/analytics/overage                    # Calculate current overage
-
-# API Usage Analytics
-GET    /api/analytics/api-usage/breakdown        # Usage by endpoint
-GET    /api/analytics/api-usage/by-user          # Usage by user
-GET    /api/analytics/api-usage/daily            # Daily usage stats
-GET    /api/analytics/api-usage/hourly-pattern   # Hourly usage pattern
-
-# Performance & Errors
-GET    /api/analytics/errors                     # Error statistics
-GET    /api/analytics/performance/slowest        # Slowest endpoints
-
-# Audit
-GET    /api/analytics/events                     # Organization events (audit log)
-
-# Platform (Super Admin Only)
-GET    /api/analytics/platform                   # Platform-wide statistics
-```
-
-### Example: Create Organization (Signup)
-
-```bash
-curl -X POST http://localhost:3000/api/organizations \
-  -H "Content-Type: application/json" \
-  -d '{
-    "name": "TechCorp Inc.",
-    "slug": "techcorp",
-    "owner_email": "admin@techcorp.com",
-    "company_name": "TechCorp Inc.",
-    "plan": "starter"
-  }'
-```
-
-Response:
-
-```json
 {
-  "success": true,
-  "message": "Organization created successfully",
-  "data": {
-    "id": "550e8400-e29b-41d4-a716-446655440000",
-    "name": "TechCorp Inc.",
-    "slug": "techcorp",
-    "plan": "starter",
-    "status": "active",
-    "max_domains": 3,
-    "max_tenants": 50,
-    "max_users": 1000,
-    "trial_ends_at": null,
-    "created_at": "2025-11-17T20:00:00Z"
-  }
+  "email": "user@example.com",
+  "password": "SecurePass123!",
+  "first_name": "John",
+  "last_name": "Doe"
 }
 ```
 
-### Example: Get Usage Statistics
+#### Login
+```http
+POST /api/auth/login
+Content-Type: application/json
 
-```bash
-curl http://localhost:3000/api/organizations/:id/usage \
-  -H "Authorization: Bearer <token>"
-```
-
-Response:
-
-```json
 {
-  "success": true,
-  "data": {
-    "current_domains": 2,
-    "current_tenants": 15,
-    "current_users": 250,
-    "current_api_calls": 45000,
-    "max_domains": 3,
-    "max_tenants": 50,
-    "max_users": 1000,
-    "max_api_calls_per_month": 100000,
-    "domains_percentage": 67,
-    "tenants_percentage": 30,
-    "users_percentage": 25,
-    "api_calls_percentage": 45
-  }
+  "email": "ahmet@example.com",
+  "password": "Test123!",
+  "domain": "crm.localhost:3001"  // Optional: filter by domain
 }
 ```
 
-## 🔒 Security Features
+**Response:**
+```json
+{
+  "message": "Login successful",
+  "user": {
+    "id": "uuid",
+    "email": "ahmet@example.com",
+    "first_name": "Ahmet"
+  },
+  "available_contexts": [
+    {
+      "domain_id": "uuid",
+      "domain_name": "CRM System",
+      "domain_url": "crm.localhost:3001",
+      "tenants": [
+        {
+          "tenant_id": "uuid",
+          "tenant_name": "Firma A",
+          "role": "Admin"
+        }
+      ]
+    }
+  ],
+  "token": "jwt-token",
+  "refresh_token": "refresh-token",
+  "needs_context_selection": false
+}
+```
 
-1. **JWT Authentication** - Secure token-based auth
-2. **Row-Level Security** - Complete data isolation
-3. **Rate Limiting** - Organization-based API rate limiting
-4. **Audit Logging** - Complete audit trail
-5. **Subscription Enforcement** - Automatic plan limits
-6. **Input Validation** - Request validation on all endpoints
+#### Select Context (if multiple contexts available)
+```http
+POST /api/auth/select-context
+Authorization: Bearer <token>
+Content-Type: application/json
 
-## 💡 Monetization Strategy
+{
+  "domain_id": "domain-uuid",
+  "tenant_id": "tenant-uuid"
+}
+```
 
-### Base Pricing
-- **Trial:** Free for 14 days
-- **Starter:** $299/month
-- **Business:** $999/month
-- **Enterprise:** Custom pricing
+#### Switch Context (change tenant)
+```http
+POST /api/auth/switch-context
+Authorization: Bearer <token>
+Content-Type: application/json
 
-### Overage Pricing
-- **Extra Users:** $5 per user/month
-- **Extra API Calls:** $1 per 1,000 calls
-- **Extra Storage:** $2 per GB/month
+{
+  "tenant_id": "tenant-uuid"
+}
+```
 
-## 🎯 Roadmap
+#### Get My Contexts
+```http
+GET /api/auth/my-contexts
+Authorization: Bearer <token>
+```
 
-- [x] Organization management
-- [x] Multi-domain support
-- [x] Usage tracking and analytics
-- [x] Plan limits enforcement
-- [x] Rate limiting
-- [ ] Stripe integration for billing
-- [ ] Invoice generation
-- [ ] Email notifications
-- [ ] React admin dashboard
-- [ ] Organization signup flow
-- [ ] Billing portal
+#### Refresh Token
+```http
+POST /api/auth/refresh
+Content-Type: application/json
+
+{
+  "refresh_token": "your-refresh-token"
+}
+```
+
+#### Get Current User
+```http
+GET /api/auth/me
+Authorization: Bearer <token>
+```
+
+#### Logout
+```http
+POST /api/auth/logout
+Content-Type: application/json
+
+{
+  "refresh_token": "your-refresh-token"
+}
+```
+
+## 🔐 JWT Token Structure
+
+```json
+{
+  "sub": "user-uuid",
+  "email": "user@example.com",
+  "contexts": [
+    {
+      "domain": "crm.localhost:3001",
+      "domain_id": "domain-uuid",
+      "domain_name": "CRM System",
+      "tenants": [
+        {
+          "tenant_id": "tenant-uuid",
+          "tenant_name": "Firma A",
+          "tenant_slug": "firma-a",
+          "roles": ["admin"],
+          "permissions": ["users-create", "users-read", ...]
+        }
+      ]
+    }
+  ],
+  "current_context": {
+    "domain_id": "domain-uuid",
+    "tenant_id": "tenant-uuid"
+  },
+  "iat": 1234567890,
+  "exp": 1234571490
+}
+```
+
+## 🧪 Test Data
+
+After running seed data, you can use these test accounts:
+
+| Email | Password | Access |
+|-------|----------|--------|
+| ahmet@example.com | Test123! | CRM (Firma A: Admin, Firma B: Sales), Analytics (Firma C: Viewer) |
+| mehmet@example.com | Test123! | CRM (Firma B: Manager) |
+| ayse@example.com | Test123! | CRM (Firma A: Sales), Analytics (Firma C: Analyst) |
+| admin@example.com | Test123! | Super Admin (All) |
+
+## 🎨 Usage Flow
+
+### Scenario 1: User with Single Domain Access
+
+```
+1. User visits crm.localhost:3001
+2. Clicks "Login"
+3. Enters email/password
+4. System detects domain from URL (crm.localhost:3001)
+5. Login successful → User gets JWT token
+6. Redirected to CRM dashboard
+7. If user has multiple tenants, dropdown shows: [Firma A ▼]
+```
+
+### Scenario 2: User with Multiple Domain Access
+
+```
+1. User visits crm.localhost:3001
+2. Logs in → Gets token with CRM context
+3. Works in Firma A
+4. Wants to switch to Analytics
+5. Clicks "Apps" → "Analytics" in navbar
+6. Redirected to analytics.localhost:3002
+7. Token is still valid (same auth service)
+8. Analytics validates token, shows Firma C context
+```
+
+### Scenario 3: Tenant Switching
+
+```
+1. User working in CRM / Firma A
+2. Dropdown shows: [Firma A ▼]
+3. Clicks dropdown → Shows "Firma B"
+4. Selects Firma B
+5. Frontend calls /api/auth/switch-context
+6. New token generated with Firma B context
+7. Page refreshes with Firma B data
+```
+
+## 🔧 Project Structure
+
+```
+oauth/
+├── auth-service/              # Central authentication service
+│   ├── src/
+│   │   ├── config/           # Configuration files
+│   │   ├── controllers/      # Route controllers
+│   │   ├── middleware/       # Express middleware
+│   │   ├── routes/           # API routes
+│   │   ├── services/         # Business logic
+│   │   ├── types/            # TypeScript types
+│   │   ├── utils/            # Utility functions
+│   │   └── index.ts          # Entry point
+│   ├── package.json
+│   └── tsconfig.json
+│
+├── client-library/           # Client library for apps (TODO)
+├── example-crm/             # Example CRM app (TODO)
+├── example-analytics/       # Example Analytics app (TODO)
+│
+├── database/
+│   ├── schema.sql           # Database schema
+│   └── seed.sql             # Test data
+│
+├── docker-compose.yml
+├── package.json
+└── README.md
+```
+
+## 🛠️ Development
+
+### Run Tests
+```bash
+# TODO: Add tests
+npm test
+```
+
+### Build for Production
+```bash
+cd auth-service
+npm run build
+
+# Start production server
+npm start
+```
+
+### Database Migrations
+```bash
+# TODO: Add migration system
+npm run db:migrate
+```
+
+## 🚢 Deployment
+
+### Docker
+
+```bash
+# Build and run all services
+docker-compose up -d
+
+# View logs
+docker-compose logs -f auth-service
+
+# Stop services
+docker-compose down
+```
+
+### Environment Variables
+
+Required environment variables for production:
+
+```bash
+NODE_ENV=production
+PORT=3000
+
+DB_HOST=your-postgres-host
+DB_PORT=5432
+DB_NAME=auth_system
+DB_USER=your-db-user
+DB_PASSWORD=your-db-password
+
+JWT_SECRET=your-very-long-and-secure-secret-key
+JWT_EXPIRES_IN=24h
+JWT_REFRESH_EXPIRES_IN=7d
+
+ALLOWED_ORIGINS=https://crm.yourdomain.com,https://analytics.yourdomain.com
+```
+
+## 🔒 Security Best Practices
+
+1. **JWT Secret**: Use a strong, random secret (at least 256 bits)
+2. **HTTPS**: Always use HTTPS in production
+3. **Password Policy**: Enforce strong passwords (implemented)
+4. **Token Expiry**: Keep access tokens short-lived (24h default)
+5. **Refresh Tokens**: Store securely, revoke on logout
+6. **CORS**: Configure allowed origins properly
+7. **Rate Limiting**: Add rate limiting for auth endpoints (TODO)
+8. **Audit Logs**: Monitor audit logs for suspicious activity
+
+## 📝 TODO
+
+- [ ] Domain and Tenant management APIs
+- [ ] Client library for easy integration
+- [ ] Example CRM project
+- [ ] Example Analytics project
+- [ ] Rate limiting
+- [ ] Email verification
+- [ ] Password reset flow
+- [ ] OAuth 2.0 providers (Google, GitHub)
+- [ ] Admin dashboard
+- [ ] API documentation (Swagger)
+- [ ] Unit and integration tests
+- [ ] CI/CD pipeline
+
+## 🤝 Contributing
+
+Contributions are welcome! Please follow these steps:
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests
+5. Submit a pull request
 
 ## 📄 License
 
-MIT License
+MIT License - see LICENSE file for details
+
+## 💬 Support
+
+For questions or issues, please open an issue on GitHub.
 
 ---
 
-Made with ❤️ for SaaS founders
+**Built with ❤️ for modern SaaS applications**

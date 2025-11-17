@@ -1,0 +1,65 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: auth_postgres
+    environment:
+      POSTGRES_DB: auth_system
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql
+      - ./database/seed.sql:/docker-entrypoint-initdb.d/02-seed.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  auth-service:
+    build:
+      context: ./auth-service
+      dockerfile: Dockerfile
+    container_name: auth_service
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      NODE_ENV: development
+      PORT: 3000
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: auth_system
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      JWT_SECRET: your-super-secret-jwt-key-change-this-in-production
+      JWT_EXPIRES_IN: 24h
+      JWT_REFRESH_EXPIRES_IN: 7d
+      ALLOWED_ORIGINS: http://localhost:3001,http://localhost:3002
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./auth-service/src:/app/src
+    command: npm run dev
+
+  # TODO: Add example apps when ready
+  # crm:
+  #   build: ./example-crm
+  #   ports:
+  #     - "3001:3001"
+  #   depends_on:
+  #     - auth-service
+
+  # analytics:
+  #   build: ./example-analytics
+  #   ports:
+  #     - "3002:3002"
+  #   depends_on:
+  #     - auth-service
+
+volumes:
+  postgres_data:

@@ -1,18 +1,34 @@
 import express from 'express';
 import cors from 'cors';
+import helmet from 'helmet';
 import dotenv from 'dotenv';
+import { config } from './config';
 import routes from './routes';
 import pool from './config/database';
-import { trackApiUsage, addUsageHeaders } from './middleware/usage-tracking.middleware';
 
-// Load environment variables
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 3000;
 
-// Middleware
-app.use(cors());
+// Security middleware
+app.use(helmet());
+
+// CORS
+app.use(cors({
+  origin: (origin, callback) => {
+    // Allow requests with no origin (mobile apps, Postman, etc.)
+    if (!origin) return callback(null, true);
+
+    if (config.cors.allowedOrigins.indexOf(origin) !== -1 || config.nodeEnv === 'development') {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true,
+}));
+
+// Body parser
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -22,67 +38,52 @@ app.use((req, res, next) => {
   next();
 });
 
-// Usage tracking and rate limiting
-app.use(addUsageHeaders);
-app.use(trackApiUsage);
-
 // Routes
 app.use('/api', routes);
 
-// Root endpoint
-app.get('/', (req, res) => {
-  res.json({
-    message: 'OAuth Multi-Tenant SaaS Platform API',
-    version: '1.0.0',
-    description: 'Enterprise-grade multi-domain multi-tenant authentication and authorization system',
-    endpoints: {
-      health: '/api/health',
-      organizations: '/api/organizations',
-      domains: '/api/domains',
-      analytics: '/api/analytics'
-    },
-    documentation: {
-      swagger: '/api/docs',
-      github: 'https://github.com/your-repo'
-    }
-  });
-});
-
-// Error handling middleware
+// Error handler
 app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
   console.error('Error:', err);
+
+  if (err.message === 'Not allowed by CORS') {
+    return res.status(403).json({ error: 'CORS policy violation' });
+  }
+
   res.status(err.status || 500).json({
-    success: false,
-    message: err.message || 'Internal server error'
+    error: err.message || 'Internal server error',
   });
 });
 
 // 404 handler
 app.use((req, res) => {
-  res.status(404).json({
-    success: false,
-    message: 'Endpoint not found'
-  });
+  res.status(404).json({ error: 'Route not found' });
 });
 
-// Start server
-const startServer = async () => {
-  try {
-    // Test database connection
-    await pool.query('SELECT NOW()');
-    console.log('✅ Database connected successfully');
-
-    app.listen(PORT, () => {
-      console.log(`🚀 Server running on port ${PORT}`);
-      console.log(`📍 API URL: http://localhost:${PORT}`);
-      console.log(`📍 Health check: http://localhost:${PORT}/api/health`);
-    });
-  } catch (error) {
-    console.error('❌ Failed to start server:', error);
-    process.exit(1);
-  }
+// Graceful shutdown
+const gracefulShutdown = async () => {
+  console.log('Shutting down gracefully...');
+  await pool.end();
+  process.exit(0);
 };
 
-startServer();
+process.on('SIGTERM', gracefulShutdown);
+process.on('SIGINT', gracefulShutdown);
+
+// Start server
+const PORT = config.port;
+
+pool.query('SELECT NOW()')
+  .then(() => {
+    console.log('✓ Database connected');
+    app.listen(PORT, () => {
+      console.log(`✓ Auth Service running on port ${PORT}`);
+      console.log(`✓ Environment: ${config.nodeEnv}`);
+      console.log(`✓ Allowed origins: ${config.cors.allowedOrigins.join(', ')}`);
+    });
+  })
+  .catch((err) => {
+    console.error('✗ Database connection failed:', err);
+    process.exit(1);
+  });
 
 export default app;
