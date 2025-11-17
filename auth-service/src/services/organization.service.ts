@@ -1,5 +1,6 @@
 import pool from '../config/database';
 import { PoolClient } from 'pg';
+import emailService from './email.service';
 
 export interface Organization {
   id: string;
@@ -163,6 +164,21 @@ class OrganizationService {
       await this.initializeMonthlyUsage(organization.id, client);
 
       await client.query('COMMIT');
+
+      // Send welcome email (async, don't block)
+      setImmediate(async () => {
+        try {
+          await emailService.sendOrganizationWelcome({
+            email: organization.billing_email || organization.owner_email,
+            organizationName: organization.name,
+            plan: organization.plan,
+            trialEndsAt: organization.trial_ends_at,
+          });
+        } catch (error) {
+          console.error('Failed to send welcome email:', error);
+        }
+      });
+
       return organization;
     } catch (error) {
       await client.query('ROLLBACK');
@@ -438,7 +454,24 @@ class OrganizationService {
       );
 
       await client.query('COMMIT');
-      return updateResult.rows[0];
+
+      const updatedOrg = updateResult.rows[0];
+
+      // Send plan upgrade email (async, don't block)
+      setImmediate(async () => {
+        try {
+          await emailService.sendPlanUpgrade({
+            email: updatedOrg.billing_email || updatedOrg.owner_email,
+            organizationName: updatedOrg.name,
+            oldPlan: currentOrg.plan,
+            newPlan: newPlanId,
+          });
+        } catch (error) {
+          console.error('Failed to send plan upgrade email:', error);
+        }
+      });
+
+      return updatedOrg;
     } catch (error) {
       await client.query('ROLLBACK');
       throw error;
