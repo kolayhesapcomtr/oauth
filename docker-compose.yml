@@ -13,7 +13,8 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./database/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql
-      - ./database/seed.sql:/docker-entrypoint-initdb.d/02-seed.sql
+      - ./database/organization-schema.sql:/docker-entrypoint-initdb.d/02-organization-schema.sql
+      - ./database/seed.sql:/docker-entrypoint-initdb.d/03-seed.sql
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 5s
@@ -39,11 +40,34 @@ services:
       JWT_SECRET: your-super-secret-jwt-key-change-this-in-production
       JWT_EXPIRES_IN: 24h
       JWT_REFRESH_EXPIRES_IN: 7d
-      ALLOWED_ORIGINS: http://localhost:3001,http://localhost:3002
+      ALLOWED_ORIGINS: http://localhost:5173,http://localhost:3001,http://localhost:3002
+      SMTP_HOST: smtp.gmail.com
+      SMTP_PORT: 587
+      SMTP_SECURE: false
+      SMTP_USER: ${SMTP_USER}
+      SMTP_PASSWORD: ${SMTP_PASSWORD}
+      SMTP_FROM_NAME: OAuth Platform
+      SMTP_FROM_EMAIL: noreply@oauth.local
+      FRONTEND_URL: http://localhost:5173
     ports:
       - "3000:3000"
     volumes:
       - ./auth-service/src:/app/src
+    command: npm run dev
+
+  admin-dashboard:
+    build:
+      context: ./admin-dashboard
+      dockerfile: Dockerfile
+    container_name: oauth_admin_dashboard
+    environment:
+      VITE_API_URL: http://localhost:3000/api
+    ports:
+      - "5173:5173"
+    depends_on:
+      - auth-service
+    volumes:
+      - ./admin-dashboard/src:/app/src
     command: npm run dev
 
   # TODO: Add example apps when ready
