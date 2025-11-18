@@ -4,6 +4,7 @@ import {
   LayoutDashboard,
   Globe,
   Users,
+  Building,
   Settings,
   LogOut,
   Menu,
@@ -16,6 +17,7 @@ const navigation = [
   { name: 'Dashboard', href: '/org', icon: LayoutDashboard },
   { name: "Domain'ler", href: '/org/domains', icon: Globe },
   { name: 'Kullanıcılar', href: '/org/users', icon: Users },
+  { name: 'Kiracılar', href: '/org/tenants', icon: Building },
   { name: 'Ayarlar', href: '/org/settings', icon: Settings },
 ];
 

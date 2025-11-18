@@ -5,6 +5,9 @@ import {
   Building2,
   BarChart3,
   Globe,
+  Building,
+  Shield,
+  FileText,
   Settings,
   LogOut,
   Menu,
@@ -17,6 +20,9 @@ const navigation = [
   { name: 'Organizasyonlar', href: '/organizations', icon: Building2 },
   { name: 'Analitik', href: '/analytics', icon: BarChart3 },
   { name: "Domain'ler", href: '/domains', icon: Globe },
+  { name: 'Kiracılar', href: '/tenants', icon: Building },
+  { name: 'İzinler', href: '/permissions', icon: Shield },
+  { name: 'Denetim Logları', href: '/audit-logs', icon: FileText },
   { name: 'Ayarlar', href: '/settings', icon: Settings },
 ];
 

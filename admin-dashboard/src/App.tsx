@@ -10,6 +10,9 @@ import OrganizationsPage from './pages/OrganizationsPage';
 import OrganizationDetailPage from './pages/OrganizationDetailPage';
 import AnalyticsPage from './pages/AnalyticsPage';
 import DomainsPage from './pages/DomainsPage';
+import TenantsPage from './pages/TenantsPage';
+import PermissionsPage from './pages/PermissionsPage';
+import AuditLogsPage from './pages/AuditLogsPage';
 import SettingsPage from './pages/SettingsPage';
 import Layout from './components/Layout';
 import OrganizationLayout from './components/OrganizationLayout';
@@ -17,6 +20,7 @@ import OrgDashboardPage from './pages/org/OrgDashboardPage';
 import OrgDomainsPage from './pages/org/OrgDomainsPage';
 import OrgDomainDetailPage from './pages/org/OrgDomainDetailPage';
 import OrgUsersPage from './pages/org/OrgUsersPage';
+import OrgTenantsPage from './pages/org/OrgTenantsPage';
 import OrgSettingsPage from './pages/org/OrgSettingsPage';
 import ProtectedRoute from './components/ProtectedRoute';
 
@@ -43,6 +47,9 @@ function App() {
         <Route path="/organizations/:id" element={<OrganizationDetailPage />} />
         <Route path="/analytics" element={<AnalyticsPage />} />
         <Route path="/domains" element={<DomainsPage />} />
+        <Route path="/tenants" element={<TenantsPage />} />
+        <Route path="/permissions" element={<PermissionsPage />} />
+        <Route path="/audit-logs" element={<AuditLogsPage />} />
         <Route path="/settings" element={<SettingsPage />} />
       </Route>
 
@@ -52,6 +59,7 @@ function App() {
         <Route path="domains" element={<OrgDomainsPage />} />
         <Route path="domains/:id" element={<OrgDomainDetailPage />} />
         <Route path="users" element={<OrgUsersPage />} />
+        <Route path="tenants" element={<OrgTenantsPage />} />
         <Route path="settings" element={<OrgSettingsPage />} />
       </Route>
 
