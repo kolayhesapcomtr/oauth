@@ -2,6 +2,9 @@ import { useEffect } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuthStore } from './store/authStore';
 import LoginPage from './pages/LoginPage';
+import VerifyEmailPage from './pages/VerifyEmailPage';
+import ForgotPasswordPage from './pages/ForgotPasswordPage';
+import ResetPasswordPage from './pages/ResetPasswordPage';
 import DashboardPage from './pages/DashboardPage';
 import OrganizationsPage from './pages/OrganizationsPage';
 import OrganizationDetailPage from './pages/OrganizationDetailPage';
@@ -29,6 +32,9 @@ function App() {
   return (
     <Routes>
       <Route path="/login" element={<LoginPage />} />
+      <Route path="/verify-email/:token" element={<VerifyEmailPage />} />
+      <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+      <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
 
       {/* Super Admin Routes */}
       <Route element={<ProtectedRoute><Layout /></ProtectedRoute>}>

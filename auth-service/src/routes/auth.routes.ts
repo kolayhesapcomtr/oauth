@@ -68,4 +68,29 @@ router.post('/logout', authController.logout);
 // Get current user info
 router.get('/me', authenticate, authController.me);
 
+// Email Verification
+router.post('/verify-email/:token', authController.verifyEmail);
+router.post('/resend-verification', authenticate, authController.resendVerification);
+
+// Password Reset
+router.post(
+  '/forgot-password',
+  validate([body('email').isEmail().normalizeEmail()]),
+  authController.forgotPassword
+);
+router.post(
+  '/reset-password/:token',
+  validate([body('password').isLength({ min: 8 })]),
+  authController.resetPassword
+);
+router.post(
+  '/change-password',
+  authenticate,
+  validate([
+    body('current_password').notEmpty(),
+    body('new_password').isLength({ min: 8 }),
+  ]),
+  authController.changePassword
+);
+
 export default router;

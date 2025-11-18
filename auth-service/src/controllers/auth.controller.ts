@@ -197,6 +197,100 @@ export class AuthController {
       res.status(500).json({ error: 'Failed to get user info' });
     }
   }
+
+  // Email Verification
+  async verifyEmail(req: Request, res: Response) {
+    try {
+      const { token } = req.params;
+
+      await authService.verifyEmail(token);
+
+      res.json({ message: 'Email verified successfully' });
+    } catch (error: any) {
+      if (error.message.includes('Invalid') || error.message.includes('expired')) {
+        return res.status(400).json({ error: error.message });
+      }
+      console.error('Verify email error:', error);
+      res.status(500).json({ error: 'Failed to verify email' });
+    }
+  }
+
+  async resendVerification(req: AuthRequest, res: Response) {
+    try {
+      const userId = req.user!.id;
+
+      await authService.resendVerificationEmail(userId);
+
+      res.json({ message: 'Verification email sent successfully' });
+    } catch (error: any) {
+      if (error.message.includes('already verified')) {
+        return res.status(400).json({ error: error.message });
+      }
+      console.error('Resend verification error:', error);
+      res.status(500).json({ error: 'Failed to resend verification email' });
+    }
+  }
+
+  // Password Reset
+  async forgotPassword(req: Request, res: Response) {
+    try {
+      const { email } = req.body;
+
+      await authService.forgotPassword(email);
+
+      // Always return success even if email doesn't exist (security best practice)
+      res.json({ message: 'If the email exists, a password reset link has been sent' });
+    } catch (error) {
+      console.error('Forgot password error:', error);
+      res.status(500).json({ error: 'Failed to process password reset request' });
+    }
+  }
+
+  async resetPassword(req: Request, res: Response) {
+    try {
+      const { token } = req.params;
+      const { password } = req.body;
+
+      // Validate password strength
+      const passwordValidation = validatePasswordStrength(password);
+      if (!passwordValidation.valid) {
+        return res.status(400).json({ error: passwordValidation.message });
+      }
+
+      await authService.resetPassword(token, password);
+
+      res.json({ message: 'Password reset successfully' });
+    } catch (error: any) {
+      if (error.message.includes('Invalid') || error.message.includes('expired')) {
+        return res.status(400).json({ error: error.message });
+      }
+      console.error('Reset password error:', error);
+      res.status(500).json({ error: 'Failed to reset password' });
+    }
+  }
+
+  async changePassword(req: AuthRequest, res: Response) {
+    try {
+      const userId = req.user!.id;
+      const { current_password, new_password } = req.body;
+
+      // Validate password strength
+      const passwordValidation = validatePasswordStrength(new_password);
+      if (!passwordValidation.valid) {
+        return res.status(400).json({ error: passwordValidation.message });
+      }
+
+      await authService.changePassword(userId, current_password, new_password);
+
+      res.json({ message: 'Password changed successfully' });
+    } catch (error: any) {
+      if (error.message.includes('Invalid') || error.message.includes('Incorrect')) {
+        return res.status(400).json({ error: error.message });
+      }
+      console.error('Change password error:', error);
+      res.status(500).json({ error: 'Failed to change password' });
+    }
+  }
 }
 
 export default new AuthController();

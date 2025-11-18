@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
 import { Lock } from 'lucide-react';
 
@@ -68,12 +68,20 @@ export default function LoginPage() {
             </div>
 
             <div>
-              <label
-                htmlFor="password"
-                className="block text-sm font-medium text-gray-700 mb-2"
-              >
-                Şifre
-              </label>
+              <div className="flex items-center justify-between mb-2">
+                <label
+                  htmlFor="password"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Şifre
+                </label>
+                <Link
+                  to="/forgot-password"
+                  className="text-sm text-primary-600 hover:text-primary-700 font-medium"
+                >
+                  Şifremi unuttum?
+                </Link>
+              </div>
               <input
                 id="password"
                 type="password"

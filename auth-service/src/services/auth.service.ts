@@ -252,6 +252,139 @@ export class AuthService {
       [refreshToken]
     );
   }
+
+  // Email Verification
+  async verifyEmail(token: string): Promise<void> {
+    const result = await query(
+      `SELECT * FROM email_verification_tokens
+       WHERE token = $1 AND expires_at > CURRENT_TIMESTAMP`,
+      [token]
+    );
+
+    if (result.rows.length === 0) {
+      throw new Error('Invalid or expired verification token');
+    }
+
+    const verificationToken = result.rows[0];
+
+    // Update user as verified
+    await query(
+      `UPDATE users
+       SET is_email_verified = true, email_verified_at = CURRENT_TIMESTAMP
+       WHERE id = $1`,
+      [verificationToken.user_id]
+    );
+
+    // Delete the verification token
+    await query('DELETE FROM email_verification_tokens WHERE token = $1', [token]);
+  }
+
+  async resendVerificationEmail(userId: string): Promise<void> {
+    const user = await userService.findById(userId);
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+    if (user.is_email_verified) {
+      throw new Error('Email is already verified');
+    }
+
+    // Generate verification token
+    const token = uuidv4();
+    const expiresAt = new Date();
+    expiresAt.setHours(expiresAt.getHours() + 24); // 24 hours
+
+    // Store token
+    await query(
+      `INSERT INTO email_verification_tokens (user_id, token, expires_at)
+       VALUES ($1, $2, $3)
+       ON CONFLICT (user_id) DO UPDATE
+       SET token = $2, expires_at = $3, created_at = CURRENT_TIMESTAMP`,
+      [userId, token, expiresAt]
+    );
+
+    // TODO: Send email with verification link
+    // For now, just log it
+    console.log(`Verification link: http://localhost:3001/verify-email/${token}`);
+  }
+
+  // Password Reset
+  async forgotPassword(email: string): Promise<void> {
+    const user = await userService.findByEmail(email);
+    if (!user) {
+      // Don't reveal that email doesn't exist (security best practice)
+      return;
+    }
+
+    // Generate password reset token
+    const token = uuidv4();
+    const expiresAt = new Date();
+    expiresAt.setHours(expiresAt.getHours() + 1); // 1 hour
+
+    // Store token
+    await query(
+      `INSERT INTO password_reset_tokens (user_id, token, expires_at)
+       VALUES ($1, $2, $3)
+       ON CONFLICT (user_id) DO UPDATE
+       SET token = $2, expires_at = $3, created_at = CURRENT_TIMESTAMP`,
+      [user.id, token, expiresAt]
+    );
+
+    // TODO: Send email with reset link
+    // For now, just log it
+    console.log(`Password reset link: http://localhost:3001/reset-password/${token}`);
+  }
+
+  async resetPassword(token: string, newPassword: string): Promise<void> {
+    const result = await query(
+      `SELECT * FROM password_reset_tokens
+       WHERE token = $1 AND expires_at > CURRENT_TIMESTAMP`,
+      [token]
+    );
+
+    if (result.rows.length === 0) {
+      throw new Error('Invalid or expired reset token');
+    }
+
+    const resetToken = result.rows[0];
+
+    // Hash new password
+    const password_hash = await hashPassword(newPassword);
+
+    // Update user password
+    await query(
+      `UPDATE users SET password_hash = $1, updated_at = CURRENT_TIMESTAMP WHERE id = $2`,
+      [password_hash, resetToken.user_id]
+    );
+
+    // Delete the reset token
+    await query('DELETE FROM password_reset_tokens WHERE token = $1', [token]);
+
+    // Revoke all refresh tokens for this user (force re-login)
+    await query('UPDATE refresh_tokens SET is_revoked = true WHERE user_id = $1', [resetToken.user_id]);
+  }
+
+  async changePassword(userId: string, currentPassword: string, newPassword: string): Promise<void> {
+    const user = await userService.findById(userId);
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+    // Verify current password
+    const isValidPassword = await comparePassword(currentPassword, user.password_hash);
+    if (!isValidPassword) {
+      throw new Error('Incorrect current password');
+    }
+
+    // Hash new password
+    const password_hash = await hashPassword(newPassword);
+
+    // Update password
+    await query(
+      `UPDATE users SET password_hash = $1, updated_at = CURRENT_TIMESTAMP WHERE id = $2`,
+      [password_hash, userId]
+    );
+  }
 }
 
 export default new AuthService();
