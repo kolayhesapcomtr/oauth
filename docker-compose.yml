@@ -3,18 +3,19 @@ version: '3.8'
 services:
   postgres:
     image: postgres:15-alpine
-    container_name: auth_postgres
+    container_name: oauth_postgres
     environment:
-      POSTGRES_DB: auth_system
+      POSTGRES_DB: oauth_db
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./database/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql
-      - ./database/organization-schema.sql:/docker-entrypoint-initdb.d/02-organization-schema.sql
-      - ./database/seed.sql:/docker-entrypoint-initdb.d/03-seed.sql
+      - ./database/migrations-001-initial-schema.sql:/docker-entrypoint-initdb.d/01-migrations-001-initial-schema.sql
+      - ./database/migrations-002-rbac.sql:/docker-entrypoint-initdb.d/02-migrations-002-rbac.sql
+      - ./database/migrations-003-subscriptions.sql:/docker-entrypoint-initdb.d/03-migrations-003-subscriptions.sql
+      - ./database/migrations-004-payment-providers.sql:/docker-entrypoint-initdb.d/04-migrations-004-payment-providers.sql
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 5s
@@ -25,7 +26,7 @@ services:
     build:
       context: ./auth-service
       dockerfile: Dockerfile
-    container_name: auth_service
+    container_name: oauth_auth_service
     depends_on:
       postgres:
         condition: service_healthy
@@ -34,18 +35,20 @@ services:
       PORT: 3000
       DB_HOST: postgres
       DB_PORT: 5432
-      DB_NAME: auth_system
+      DB_NAME: oauth_db
       DB_USER: postgres
       DB_PASSWORD: postgres
-      JWT_SECRET: your-super-secret-jwt-key-change-this-in-production
+      JWT_SECRET: dev-jwt-secret-key-min-256-bits-change-in-production-xxxxxxxxxxxxxxx
       JWT_EXPIRES_IN: 24h
+      JWT_REFRESH_SECRET: dev-refresh-secret-key-change-in-production-xxxxxxxxxxxxxxxxx
       JWT_REFRESH_EXPIRES_IN: 7d
+      PAYMENT_ENCRYPTION_KEY: dev-payment-encryption-32-chars
       ALLOWED_ORIGINS: http://localhost:5173,http://localhost:3001,http://localhost:3002
       SMTP_HOST: smtp.gmail.com
       SMTP_PORT: 587
       SMTP_SECURE: false
-      SMTP_USER: ${SMTP_USER}
-      SMTP_PASSWORD: ${SMTP_PASSWORD}
+      SMTP_USER: ${SMTP_USER:-noreply@oauth.local}
+      SMTP_PASSWORD: ${SMTP_PASSWORD:-password}
       SMTP_FROM_NAME: OAuth Platform
       SMTP_FROM_EMAIL: noreply@oauth.local
       FRONTEND_URL: http://localhost:5173
