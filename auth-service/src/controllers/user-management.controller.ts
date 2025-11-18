@@ -5,11 +5,12 @@ import { AuthRequest } from '../middleware/auth.middleware';
 export class UserManagementController {
   async listUsers(req: Request, res: Response) {
     try {
-      const { domain_id, tenant_id, is_active, search } = req.query;
+      const { domain_id, tenant_id, organization_id, is_active, search } = req.query;
 
       const users = await userManagementService.getAllUsers({
         domain_id: domain_id as string,
         tenant_id: tenant_id as string,
+        organization_id: organization_id as string,
         is_active: is_active === 'true' ? true : is_active === 'false' ? false : undefined,
         search: search as string,
       });

@@ -221,6 +221,7 @@ export class UserManagementService {
   async getAllUsers(filters?: {
     domain_id?: string;
     tenant_id?: string;
+    organization_id?: string;
     is_active?: boolean;
     search?: string;
   }): Promise<any[]> {
@@ -241,7 +242,7 @@ export class UserManagementService {
     const values: any[] = [];
     let paramCount = 1;
 
-    if (filters?.domain_id || filters?.tenant_id) {
+    if (filters?.domain_id || filters?.tenant_id || filters?.organization_id) {
       sql += `
         JOIN user_tenant_roles utr ON u.id = utr.user_id
         JOIN tenants t ON utr.tenant_id = t.id
@@ -255,6 +256,11 @@ export class UserManagementService {
       if (filters.tenant_id) {
         conditions.push(`utr.tenant_id = $${paramCount++}`);
         values.push(filters.tenant_id);
+      }
+
+      if (filters.organization_id) {
+        conditions.push(`t.organization_id = $${paramCount++}`);
+        values.push(filters.organization_id);
       }
     }
 
