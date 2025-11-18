@@ -9,6 +9,7 @@ import permissionRoutes from './permission.routes';
 import userManagementRoutes from './user-management.routes';
 import subscriptionPlanRoutes from './subscription-plan.routes';
 import tenantSubscriptionPlanRoutes from './tenant-subscription-plan.routes';
+import paymentRoutes from './payment.routes';
 
 const router = express.Router();
 
@@ -33,6 +34,9 @@ router.use('/tenant-subscription-plans', tenantSubscriptionPlanRoutes);
 router.use('/roles', roleRoutes);
 router.use('/permissions', permissionRoutes);
 router.use('/user-management', userManagementRoutes);
+
+// Payment routes
+router.use('/payment', paymentRoutes);
 
 // Analytics routes
 router.use('/analytics', analyticsRoutes);
