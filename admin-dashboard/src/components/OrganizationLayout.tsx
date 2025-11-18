@@ -10,6 +10,7 @@ import {
   Menu,
   X,
   Building2,
+  DollarSign,
 } from 'lucide-react';
 import { useState } from 'react';
 
@@ -18,6 +19,7 @@ const navigation = [
   { name: "Domain'ler", href: '/org/domains', icon: Globe },
   { name: 'Kullanıcılar', href: '/org/users', icon: Users },
   { name: 'Kiracılar', href: '/org/tenants', icon: Building },
+  { name: 'Abonelik Planları', href: '/org/tenant-plans', icon: DollarSign },
   { name: 'Ayarlar', href: '/org/settings', icon: Settings },
 ];
 
