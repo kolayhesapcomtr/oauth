@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useAuthStore } from '../../store/authStore';
-import { api } from '../../services/api';
+import { api } from '../../lib/api';
 import { Globe, Users, Activity, CreditCard, TrendingUp } from 'lucide-react';
 
 interface OrganizationUsage {

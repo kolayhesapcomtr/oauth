@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Settings, Mail, Shield, Database, CreditCard, Save } from 'lucide-react';
-import { api } from '../services/api';
+import { api } from '../lib/api';
 
 interface PlatformSettings {
   platform_name: string;

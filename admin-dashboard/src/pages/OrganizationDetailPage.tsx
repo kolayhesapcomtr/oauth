@@ -379,8 +379,8 @@ function UserInviteModal({
     setError('');
 
     try {
-      // This would call your invite endpoint
-      await api.post('/users/invite', {
+      // TODO: Backend expects tenant_id and role_id, need to create org-level invitation endpoint
+      await api.post('/user-management/invitations', {
         organization_id: organizationId,
         email,
         first_name: firstName,

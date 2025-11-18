@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuthStore } from '../../store/authStore';
 import { UserPlus, Mail, Shield, Edit2, Trash2, CheckCircle, XCircle, Crown } from 'lucide-react';
-import { api } from '../../services/api';
+import { api } from '../../lib/api';
 import { format } from 'date-fns';
 
 interface User {
@@ -343,7 +343,8 @@ function UserInviteModal({
     setError('');
 
     try {
-      await api.post('/users/invite', {
+      // TODO: Backend expects tenant_id and role_id, need to create org-level invitation endpoint
+      await api.post('/user-management/invitations', {
         organization_id: organizationId,
         ...formData,
       });

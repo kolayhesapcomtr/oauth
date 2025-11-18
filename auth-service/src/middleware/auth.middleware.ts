@@ -6,6 +6,8 @@ export interface AuthRequest extends Request {
   user?: {
     id: string;
     email: string;
+    organization_id?: string;
+    is_super_admin?: boolean;
     contexts: TokenPayload['contexts'];
     current_context?: TokenPayload['current_context'];
   };
@@ -28,9 +30,18 @@ export const authenticate = async (
     try {
       const payload = verifyToken(token);
 
+      // Fetch user to get organization_id and is_super_admin
+      const user = await userService.findById(payload.sub);
+
+      if (!user) {
+        return res.status(401).json({ error: 'User not found' });
+      }
+
       req.user = {
         id: payload.sub,
         email: payload.email,
+        organization_id: user.organization_id,
+        is_super_admin: user.is_super_admin || false,
         contexts: payload.contexts,
         current_context: payload.current_context,
       };
@@ -110,4 +121,21 @@ export const requireRole = (roleSlug: string) => {
 
     next();
   };
+};
+
+// Alias for compatibility with routes that use authenticateToken
+export const authenticateToken = authenticate;
+
+// Super admin middleware
+export const requireSuperAdmin = async (
+  req: AuthRequest,
+  res: Response,
+  next: NextFunction
+) => {
+  if (!req.user?.is_super_admin) {
+    return res.status(403).json({
+      error: 'Super admin access required'
+    });
+  }
+  next();
 };

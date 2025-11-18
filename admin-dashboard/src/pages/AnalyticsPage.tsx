@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { TrendingUp, Activity, AlertCircle, Clock } from 'lucide-react';
-import { api } from '../services/api';
+import { api } from '../lib/api';
 import { format, subMonths } from 'date-fns';
 
 interface UsageTrendData {

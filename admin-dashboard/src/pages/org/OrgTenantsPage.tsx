@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useAuthStore } from '../../store/authStore';
-import { api } from '../../services/api';
+import { api } from '../../lib/api';
 import { Building, Plus } from 'lucide-react';
 
 interface Tenant {

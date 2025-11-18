@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { api } from '../services/api';
+import { api } from '../lib/api';
 import { FileText, Search, Filter } from 'lucide-react';
 import { format } from 'date-fns';
 
@@ -26,7 +26,7 @@ export default function AuditLogsPage() {
 
   const loadLogs = async () => {
     try {
-      const response = await api.get('/audit-logs');
+      const response = await api.get('/analytics/events');
       setLogs(response.data.data || response.data || []);
     } catch (error) {
       console.error('Failed to load audit logs:', error);
