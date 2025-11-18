@@ -22,6 +22,8 @@ import OrgDomainDetailPage from './pages/org/OrgDomainDetailPage';
 import OrgUsersPage from './pages/org/OrgUsersPage';
 import OrgTenantsPage from './pages/org/OrgTenantsPage';
 import OrgTenantPlansPage from './pages/org/OrgTenantPlansPage';
+import OrgPaymentSettingsPage from './pages/org/OrgPaymentSettingsPage';
+import OrgPaymentsPage from './pages/org/OrgPaymentsPage';
 import OrgSettingsPage from './pages/org/OrgSettingsPage';
 import ProtectedRoute from './components/ProtectedRoute';
 
@@ -62,6 +64,8 @@ function App() {
         <Route path="users" element={<OrgUsersPage />} />
         <Route path="tenants" element={<OrgTenantsPage />} />
         <Route path="tenant-plans" element={<OrgTenantPlansPage />} />
+        <Route path="payment-settings" element={<OrgPaymentSettingsPage />} />
+        <Route path="payments" element={<OrgPaymentsPage />} />
         <Route path="settings" element={<OrgSettingsPage />} />
       </Route>
 
