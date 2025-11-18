@@ -88,8 +88,8 @@ export default function AnalyticsPage() {
     return (
       <div className="space-y-6">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Analytics</h1>
-          <p className="text-gray-600 mt-1">Platform usage and analytics</p>
+          <h1 className="text-3xl font-bold text-gray-900">Analitik</h1>
+          <p className="text-gray-600 mt-1">Platform kullanımı ve analitik</p>
         </div>
         <div className="bg-white rounded-lg shadow-sm border p-12 text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto"></div>
@@ -102,8 +102,8 @@ export default function AnalyticsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold text-gray-900">Analytics</h1>
-        <p className="text-gray-600 mt-1">Platform usage and performance metrics</p>
+        <h1 className="text-3xl font-bold text-gray-900">Analitik</h1>
+        <p className="text-gray-600 mt-1">Platform kullanımı ve performans metrikleri</p>
       </div>
 
       {/* Performance Metrics Cards */}
@@ -111,7 +111,7 @@ export default function AnalyticsPage() {
         <div className="bg-white rounded-lg shadow-sm border p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600">Total API Calls</p>
+              <p className="text-sm text-gray-600">Toplam API Çağrıları</p>
               <p className="text-2xl font-bold text-gray-900 mt-1">
                 {metrics.total_calls.toLocaleString()}
               </p>
@@ -120,14 +120,14 @@ export default function AnalyticsPage() {
           </div>
           <div className="mt-4 flex items-center text-sm">
             <TrendingUp className="h-4 w-4 text-green-500 mr-1" />
-            <span className="text-green-600">Last 6 months</span>
+            <span className="text-green-600">Son 6 ay</span>
           </div>
         </div>
 
         <div className="bg-white rounded-lg shadow-sm border p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600">Avg Response Time</p>
+              <p className="text-sm text-gray-600">Ort. Yanıt Süresi</p>
               <p className="text-2xl font-bold text-gray-900 mt-1">
                 {metrics.avg_response_time}ms
               </p>
@@ -135,14 +135,14 @@ export default function AnalyticsPage() {
             <Clock className="h-10 w-10 text-purple-500" />
           </div>
           <div className="mt-4 flex items-center text-sm">
-            <span className="text-gray-600">System performance</span>
+            <span className="text-gray-600">Sistem performansı</span>
           </div>
         </div>
 
         <div className="bg-white rounded-lg shadow-sm border p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600">Success Rate</p>
+              <p className="text-sm text-gray-600">Başarı Oranı</p>
               <p className="text-2xl font-bold text-gray-900 mt-1">
                 {metrics.success_rate.toFixed(1)}%
               </p>
@@ -150,14 +150,14 @@ export default function AnalyticsPage() {
             <TrendingUp className="h-10 w-10 text-green-500" />
           </div>
           <div className="mt-4 flex items-center text-sm">
-            <span className="text-green-600">Healthy status</span>
+            <span className="text-green-600">Sağlıklı durum</span>
           </div>
         </div>
 
         <div className="bg-white rounded-lg shadow-sm border p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600">Error Rate</p>
+              <p className="text-sm text-gray-600">Hata Oranı</p>
               <p className="text-2xl font-bold text-gray-900 mt-1">
                 {metrics.error_rate.toFixed(2)}%
               </p>
@@ -165,7 +165,7 @@ export default function AnalyticsPage() {
             <AlertCircle className="h-10 w-10 text-orange-500" />
           </div>
           <div className="mt-4 flex items-center text-sm">
-            <span className="text-gray-600">Monitoring active</span>
+            <span className="text-gray-600">İzleme aktif</span>
           </div>
         </div>
       </div>
@@ -195,7 +195,7 @@ export default function AnalyticsPage() {
 
       {/* API Endpoints Breakdown */}
       <div className="bg-white rounded-lg shadow-sm border p-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">Top API Endpoints</h2>
+        <h2 className="text-lg font-semibold text-gray-900 mb-4">En Çok Kullanılan API Endpoint'leri</h2>
         {apiBreakdown.length > 0 ? (
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={apiBreakdown}>
@@ -216,7 +216,7 @@ export default function AnalyticsPage() {
 
       {/* Error Statistics Table */}
       <div className="bg-white rounded-lg shadow-sm border p-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">Error Statistics</h2>
+        <h2 className="text-lg font-semibold text-gray-900 mb-4">Hata İstatistikleri</h2>
         {errorStats.length > 0 ? (
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200">

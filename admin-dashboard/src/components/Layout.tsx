@@ -14,10 +14,10 @@ import { useState } from 'react';
 
 const navigation = [
   { name: 'Dashboard', href: '/', icon: LayoutDashboard },
-  { name: 'Organizations', href: '/organizations', icon: Building2 },
-  { name: 'Analytics', href: '/analytics', icon: BarChart3 },
-  { name: 'Domains', href: '/domains', icon: Globe },
-  { name: 'Settings', href: '/settings', icon: Settings },
+  { name: 'Organizasyonlar', href: '/organizations', icon: Building2 },
+  { name: 'Analitik', href: '/analytics', icon: BarChart3 },
+  { name: "Domain'ler", href: '/domains', icon: Globe },
+  { name: 'Ayarlar', href: '/settings', icon: Settings },
 ];
 
 export default function Layout() {
@@ -115,7 +115,7 @@ export default function Layout() {
               className="w-full flex items-center gap-2 px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50 rounded-lg transition-colors"
             >
               <LogOut className="h-4 w-4" />
-              Logout
+              Çıkış Yap
             </button>
           </div>
         </div>
@@ -134,7 +134,7 @@ export default function Layout() {
           <div className="flex-1"></div>
           {user?.is_super_admin && (
             <span className="px-3 py-1 text-xs font-medium bg-purple-100 text-purple-700 rounded-full">
-              Super Admin
+              Süper Admin
             </span>
           )}
         </div>

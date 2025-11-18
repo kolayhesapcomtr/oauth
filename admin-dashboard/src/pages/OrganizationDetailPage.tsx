@@ -130,22 +130,22 @@ export default function OrganizationDetailPage() {
       </div>
 
       <div className="bg-white rounded-lg shadow-sm border p-6">
-        <h2 className="text-lg font-semibold mb-4">Organization Details</h2>
+        <h2 className="text-lg font-semibold mb-4">Organizasyon Detayları</h2>
         <div className="grid grid-cols-2 gap-4">
           <div>
             <p className="text-sm text-gray-600">Plan</p>
             <p className="font-semibold capitalize">{organization.plan}</p>
           </div>
           <div>
-            <p className="text-sm text-gray-600">Status</p>
+            <p className="text-sm text-gray-600">Durum</p>
             <p className="font-semibold capitalize">{organization.status}</p>
           </div>
           <div>
-            <p className="text-sm text-gray-600">Owner Email</p>
+            <p className="text-sm text-gray-600">Sahip E-posta</p>
             <p className="font-semibold">{organization.owner_email}</p>
           </div>
           <div>
-            <p className="text-sm text-gray-600">Billing Email</p>
+            <p className="text-sm text-gray-600">Fatura E-posta</p>
             <p className="font-semibold">{organization.billing_email}</p>
           </div>
         </div>
@@ -239,8 +239,8 @@ function PlanUpgradeModal({
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
         <div className="p-6 border-b">
-          <h2 className="text-2xl font-bold text-gray-900">Upgrade Subscription Plan</h2>
-          <p className="text-gray-600 mt-1">Current plan: <span className="font-semibold capitalize">{currentPlan}</span></p>
+          <h2 className="text-2xl font-bold text-gray-900">Abonelik Planını Yükselt</h2>
+          <p className="text-gray-600 mt-1">Mevcut plan: <span className="font-semibold capitalize">{currentPlan}</span></p>
         </div>
 
         <div className="p-6">
@@ -313,19 +313,19 @@ function PlanUpgradeModal({
                     <ul className="mt-6 space-y-3 text-sm">
                       <li className="flex items-center gap-2">
                         <span className="text-green-500">✓</span>
-                        <span>{plan.max_domains === -1 ? 'Unlimited' : plan.max_domains} Domains</span>
+                        <span>{plan.max_domains === -1 ? 'Sınırsız' : plan.max_domains} Domains</span>
                       </li>
                       <li className="flex items-center gap-2">
                         <span className="text-green-500">✓</span>
-                        <span>{plan.max_tenants === -1 ? 'Unlimited' : plan.max_tenants.toLocaleString()} Tenants</span>
+                        <span>{plan.max_tenants === -1 ? 'Sınırsız' : plan.max_tenants.toLocaleString()} Tenants</span>
                       </li>
                       <li className="flex items-center gap-2">
                         <span className="text-green-500">✓</span>
-                        <span>{plan.max_users === -1 ? 'Unlimited' : plan.max_users.toLocaleString()} Users</span>
+                        <span>{plan.max_users === -1 ? 'Sınırsız' : plan.max_users.toLocaleString()} Users</span>
                       </li>
                       <li className="flex items-center gap-2">
                         <span className="text-green-500">✓</span>
-                        <span>{plan.max_api_calls_per_month === -1 ? 'Unlimited' : `${(plan.max_api_calls_per_month / 1000).toFixed(0)}K`} API Calls/mo</span>
+                        <span>{plan.max_api_calls_per_month === -1 ? 'Sınırsız' : `${(plan.max_api_calls_per_month / 1000).toFixed(0)}K`} API Calls/mo</span>
                       </li>
                     </ul>
                   </div>
@@ -347,7 +347,7 @@ function PlanUpgradeModal({
             disabled={!selectedPlan || upgrading}
             className="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50 transition-colors"
           >
-            {upgrading ? 'Upgrading...' : 'Upgrade Plan'}
+            {upgrading ? 'Yükseltiliyor...' : 'Planı Yükselt'}
           </button>
         </div>
       </div>
@@ -392,7 +392,7 @@ function UserInviteModal({
         onSuccess();
       }, 2000);
     } catch (err: any) {
-      setError(err.response?.data?.error || 'Failed to send invitation');
+      setError(err.response?.data?.error || 'Davetiye gönderilemedi');
     } finally {
       setSending(false);
     }
@@ -418,8 +418,8 @@ function UserInviteModal({
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-lg max-w-md w-full">
         <div className="p-6 border-b">
-          <h2 className="text-2xl font-bold text-gray-900">Invite User</h2>
-          <p className="text-gray-600 mt-1">Send an invitation to join this organization</p>
+          <h2 className="text-2xl font-bold text-gray-900">Kullanıcı Davet Et</h2>
+          <p className="text-gray-600 mt-1">Bu organizasyona katılmak için davetiye gönderin</p>
         </div>
 
         <form onSubmit={handleInvite} className="p-6 space-y-4">
@@ -467,15 +467,15 @@ function UserInviteModal({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Role</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Rol</label>
             <select
               value={role}
               onChange={(e) => setRole(e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
             >
-              <option value="user">User</option>
-              <option value="admin">Admin</option>
-              <option value="viewer">Viewer</option>
+              <option value="user">Kullanıcı</option>
+              <option value="admin">Yönetici</option>
+              <option value="viewer">Görüntüleyici</option>
             </select>
           </div>
 
@@ -485,7 +485,7 @@ function UserInviteModal({
               disabled={sending}
               className="flex-1 bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 disabled:opacity-50 transition-colors"
             >
-              {sending ? 'Sending...' : 'Send Invitation'}
+              {sending ? 'Gönderiliyor...' : 'Davetiye Gönder'}
             </button>
             <button
               type="button"

@@ -38,7 +38,7 @@ export default function LoginPage() {
               OAuth Admin
             </h1>
             <p className="text-gray-600">
-              Sign in to manage your platform
+              Platformunuzu yönetmek için giriş yapın
             </p>
           </div>
 
@@ -54,7 +54,7 @@ export default function LoginPage() {
                 htmlFor="email"
                 className="block text-sm font-medium text-gray-700 mb-2"
               >
-                Email Address
+                E-posta Adresi
               </label>
               <input
                 id="email"
@@ -72,7 +72,7 @@ export default function LoginPage() {
                 htmlFor="password"
                 className="block text-sm font-medium text-gray-700 mb-2"
               >
-                Password
+                Şifre
               </label>
               <input
                 id="password"
@@ -90,13 +90,13 @@ export default function LoginPage() {
               disabled={loading}
               className="w-full py-3 px-4 bg-primary-600 hover:bg-primary-700 text-white font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {loading ? 'Signing in...' : 'Sign In'}
+              {loading ? 'Giriş yapılıyor...' : 'Giriş Yap'}
             </button>
           </form>
 
           <div className="mt-6 text-center">
             <p className="text-xs text-gray-500">
-              Multi-Tenant SaaS Authentication Platform
+              Çok Kiracılı SaaS Kimlik Doğrulama Platformu
             </p>
           </div>
         </div>

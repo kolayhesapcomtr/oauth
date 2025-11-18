@@ -73,7 +73,7 @@ export default function SettingsPage() {
       const response = await api.get('/stats');
       setSystemInfo({
         version: '1.0.0',
-        database_status: 'Connected',
+        database_status: 'Bağlı',
         total_organizations: response.data.total_organizations || 0,
         total_domains: response.data.total_domains || 0,
         total_users: response.data.total_users || 0,
@@ -93,24 +93,24 @@ export default function SettingsPage() {
       await new Promise((resolve) => setTimeout(resolve, 1000));
       setMessage({ type: 'success', text: 'Settings saved successfully!' });
     } catch (error) {
-      setMessage({ type: 'error', text: 'Failed to save settings' });
+      setMessage({ type: 'error', text: 'Ayarlar kaydedilemedi' });
     } finally {
       setSaving(false);
     }
   };
 
   const tabs = [
-    { id: 'general', name: 'General', icon: Settings },
-    { id: 'email', name: 'Email', icon: Mail },
-    { id: 'security', name: 'Security', icon: Shield },
-    { id: 'system', name: 'System', icon: Database },
+    { id: 'general', name: 'Genel', icon: Settings },
+    { id: 'email', name: 'E-posta', icon: Mail },
+    { id: 'security', name: 'Güvenlik', icon: Shield },
+    { id: 'system', name: 'Sistem', icon: Database },
   ];
 
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold text-gray-900">Settings</h1>
-        <p className="text-gray-600 mt-1">Manage platform configuration and settings</p>
+        <h1 className="text-3xl font-bold text-gray-900">Ayarlar</h1>
+        <p className="text-gray-600 mt-1">Platform yapılandırmasını ve ayarlarını yönetin</p>
       </div>
 
       {message.text && (
@@ -231,7 +231,7 @@ export default function SettingsPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">SMTP User</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">SMTP Kullanıcı</label>
                 <input
                   type="text"
                   value={settings.smtp_user}
@@ -312,7 +312,7 @@ export default function SettingsPage() {
               </div>
 
               <div className="border-t pt-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Security Best Practices</h3>
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">Güvenlik En İyi Uygulamaları</h3>
                 <ul className="space-y-2 text-sm text-gray-600">
                   <li className="flex items-start gap-2">
                     <span className="text-green-500 mt-1">✓</span>
@@ -320,11 +320,11 @@ export default function SettingsPage() {
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="text-green-500 mt-1">✓</span>
-                    <span>Enable HTTPS in production</span>
+                    <span>Production'da HTTPS'i etkinleştirin</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="text-green-500 mt-1">✓</span>
-                    <span>Regularly rotate JWT secrets</span>
+                    <span>JWT secret'larını düzenli olarak değiştirin</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="text-green-500 mt-1">✓</span>
@@ -342,21 +342,21 @@ export default function SettingsPage() {
           {activeTab === 'system' && (
             <div className="space-y-6">
               <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">System Information</h3>
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">Sistem Bilgisi</h3>
                 {systemInfo ? (
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="bg-gray-50 rounded-lg p-4">
-                      <p className="text-sm text-gray-600">Version</p>
+                      <p className="text-sm text-gray-600">Versiyon</p>
                       <p className="text-2xl font-bold text-gray-900">{systemInfo.version}</p>
                     </div>
                     <div className="bg-gray-50 rounded-lg p-4">
-                      <p className="text-sm text-gray-600">Database Status</p>
+                      <p className="text-sm text-gray-600">Veritabanı Durumu</p>
                       <p className="text-2xl font-bold text-green-600">
                         {systemInfo.database_status}
                       </p>
                     </div>
                     <div className="bg-gray-50 rounded-lg p-4">
-                      <p className="text-sm text-gray-600">Organizations</p>
+                      <p className="text-sm text-gray-600">Organizasyonlar</p>
                       <p className="text-2xl font-bold text-gray-900">
                         {systemInfo.total_organizations}
                       </p>
@@ -366,7 +366,7 @@ export default function SettingsPage() {
                       <p className="text-2xl font-bold text-gray-900">{systemInfo.total_domains}</p>
                     </div>
                     <div className="bg-gray-50 rounded-lg p-4">
-                      <p className="text-sm text-gray-600">Tenants</p>
+                      <p className="text-sm text-gray-600">Kiracılar</p>
                       <p className="text-2xl font-bold text-gray-900">{systemInfo.total_tenants}</p>
                     </div>
                     <div className="bg-gray-50 rounded-lg p-4">
@@ -380,7 +380,7 @@ export default function SettingsPage() {
               </div>
 
               <div className="border-t pt-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Database Management</h3>
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">Veritabanı Yönetimi</h3>
                 <div className="space-y-3">
                   <button className="w-full md:w-auto px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
                     Backup Database
@@ -392,7 +392,7 @@ export default function SettingsPage() {
               </div>
 
               <div className="border-t pt-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Environment</h3>
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">Ortam</h3>
                 <div className="bg-gray-50 rounded-lg p-4 font-mono text-sm text-gray-700">
                   <div>NODE_ENV: development</div>
                   <div>API_VERSION: v1</div>
@@ -412,7 +412,7 @@ export default function SettingsPage() {
               className="flex items-center gap-2 bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700 disabled:opacity-50 transition-colors"
             >
               <Save className="h-5 w-5" />
-              {saving ? 'Saving...' : 'Save Settings'}
+              {saving ? 'Saving...' : 'Ayarları Kaydet'}
             </button>
           </div>
         )}

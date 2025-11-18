@@ -44,7 +44,7 @@ export default function DashboardPage() {
 
   const statCards = [
     {
-      name: 'Organizations',
+      name: 'Organizasyonlar',
       value: stats?.total_organizations || 0,
       icon: Building2,
       color: 'bg-blue-500',
@@ -52,7 +52,7 @@ export default function DashboardPage() {
       trend: 'up',
     },
     {
-      name: 'Domains',
+      name: "Domain'ler",
       value: stats?.total_domains || 0,
       icon: Globe,
       color: 'bg-green-500',
@@ -60,7 +60,7 @@ export default function DashboardPage() {
       trend: 'up',
     },
     {
-      name: 'Total Users',
+      name: 'Toplam Kullanıcı',
       value: stats?.total_users || 0,
       icon: Users,
       color: 'bg-purple-500',
@@ -68,7 +68,7 @@ export default function DashboardPage() {
       trend: 'up',
     },
     {
-      name: 'API Calls Today',
+      name: 'Bugünkü API Çağrıları',
       value: stats?.api_calls_today || 0,
       icon: Activity,
       color: 'bg-orange-500',
@@ -81,7 +81,7 @@ export default function DashboardPage() {
     <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
-        <p className="text-gray-600 mt-1">Platform overview and statistics</p>
+        <p className="text-gray-600 mt-1">Platform genel bakış ve istatistikler</p>
       </div>
 
       {/* Stats Grid */}
@@ -117,7 +117,7 @@ export default function DashboardPage() {
       {/* Plan Distribution */}
       <div className="bg-white rounded-lg shadow-sm border p-6">
         <h2 className="text-lg font-semibold text-gray-900 mb-4">
-          Plan Distribution
+          Plan Dağılımı
         </h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {stats?.plan_distribution.map((plan) => (
@@ -133,31 +133,31 @@ export default function DashboardPage() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="bg-white rounded-lg shadow-sm border p-6">
           <h2 className="text-lg font-semibold text-gray-900 mb-4">
-            Total Revenue
+            Toplam Gelir
           </h2>
           <p className="text-4xl font-bold text-green-600">
             ${stats?.revenue.total.toLocaleString() || 0}
           </p>
           <p className="text-gray-600 text-sm mt-2">
-            From {stats?.revenue.invoices || 0} paid invoices
+            {stats?.revenue.invoices || 0} ödenen faturadan
           </p>
         </div>
 
         <div className="bg-white rounded-lg shadow-sm border p-6">
           <h2 className="text-lg font-semibold text-gray-900 mb-4">
-            Platform Activity
+            Platform Aktivitesi
           </h2>
           <div className="space-y-3">
             <div className="flex justify-between">
-              <span className="text-gray-600">Active Organizations</span>
+              <span className="text-gray-600">Aktif Organizasyonlar</span>
               <span className="font-semibold">{stats?.total_organizations}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-gray-600">Total Domains</span>
+              <span className="text-gray-600">Toplam Domain'ler</span>
               <span className="font-semibold">{stats?.total_domains}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-gray-600">Total Tenants</span>
+              <span className="text-gray-600">Toplam Kiracılar</span>
               <span className="font-semibold">{stats?.total_tenants}</span>
             </div>
           </div>
