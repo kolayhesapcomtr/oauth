@@ -7,6 +7,8 @@ import tenantRoutes from './tenant.routes';
 import roleRoutes from './role.routes';
 import permissionRoutes from './permission.routes';
 import userManagementRoutes from './user-management.routes';
+import subscriptionPlanRoutes from './subscription-plan.routes';
+import tenantSubscriptionPlanRoutes from './tenant-subscription-plan.routes';
 
 const router = express.Router();
 
@@ -18,12 +20,16 @@ router.get('/health', (req, res) => {
 // Organization routes (SaaS Platform Layer)
 router.use('/organizations', organizationRoutes);
 
+// Subscription plans (Platform level)
+router.use('/subscription-plans', subscriptionPlanRoutes);
+
 // Auth routes
 router.use('/auth', authRoutes);
 
 // Management routes
 router.use('/domains', domainRoutes);
 router.use('/tenants', tenantRoutes);
+router.use('/tenant-subscription-plans', tenantSubscriptionPlanRoutes);
 router.use('/roles', roleRoutes);
 router.use('/permissions', permissionRoutes);
 router.use('/user-management', userManagementRoutes);
