@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../../store/authStore';
 import { Globe, Plus, Edit2, Trash2, CheckCircle, XCircle } from 'lucide-react';
 import { api } from '../../services/api';
@@ -17,6 +18,7 @@ interface Domain {
 }
 
 export default function OrgDomainsPage() {
+  const navigate = useNavigate();
   const { user } = useAuthStore();
   const [domains, setDomains] = useState<Domain[]>([]);
   const [loading, setLoading] = useState(true);
@@ -123,10 +125,11 @@ export default function OrgDomainsPage() {
 
               <div className="flex items-center gap-2">
                 <button
-                  className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-gray-100 text-gray-700 rounded hover:bg-gray-200 transition-colors"
+                  onClick={() => navigate(`/org/domains/${domain.id}`)}
+                  className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition-colors"
                 >
                   <Edit2 className="h-4 w-4" />
-                  Düzenle
+                  Detaylar
                 </button>
                 <button
                   onClick={() => handleDelete(domain.id)}

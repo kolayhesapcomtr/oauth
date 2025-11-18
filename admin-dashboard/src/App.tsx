@@ -12,6 +12,7 @@ import Layout from './components/Layout';
 import OrganizationLayout from './components/OrganizationLayout';
 import OrgDashboardPage from './pages/org/OrgDashboardPage';
 import OrgDomainsPage from './pages/org/OrgDomainsPage';
+import OrgDomainDetailPage from './pages/org/OrgDomainDetailPage';
 import OrgUsersPage from './pages/org/OrgUsersPage';
 import OrgSettingsPage from './pages/org/OrgSettingsPage';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -43,6 +44,7 @@ function App() {
       <Route path="/org" element={<ProtectedRoute><OrganizationLayout /></ProtectedRoute>}>
         <Route index element={<OrgDashboardPage />} />
         <Route path="domains" element={<OrgDomainsPage />} />
+        <Route path="domains/:id" element={<OrgDomainDetailPage />} />
         <Route path="users" element={<OrgUsersPage />} />
         <Route path="settings" element={<OrgSettingsPage />} />
       </Route>
