@@ -164,6 +164,73 @@ export class DomainService {
     );
     return parseInt(result.rows[0].count);
   }
+
+  // Callback URL Management
+  async getCallbacks(domainId: string): Promise<any[]> {
+    const result = await query(
+      'SELECT id, domain_id, url, created_at FROM domain_callback_urls WHERE domain_id = $1 ORDER BY created_at DESC',
+      [domainId]
+    );
+    return result.rows;
+  }
+
+  async addCallback(domainId: string, url: string): Promise<any> {
+    const result = await query(
+      'INSERT INTO domain_callback_urls (domain_id, url) VALUES ($1, $2) RETURNING *',
+      [domainId, url]
+    );
+    return result.rows[0];
+  }
+
+  async deleteCallback(callbackId: string): Promise<void> {
+    await query('DELETE FROM domain_callback_urls WHERE id = $1', [callbackId]);
+  }
+
+  // Client Secret Management
+  async regenerateSecret(domainId: string): Promise<Domain> {
+    const crypto = require('crypto');
+    const newSecret = crypto.randomBytes(32).toString('hex');
+
+    const result = await query(
+      'UPDATE domains SET client_secret = $1, updated_at = NOW() WHERE id = $2 RETURNING *',
+      [newSecret, domainId]
+    );
+
+    return result.rows[0];
+  }
+
+  // Usage Statistics (Last 7 days)
+  async getUsageStats(domainId: string): Promise<any[]> {
+    const result = await query(
+      `SELECT
+        DATE(created_at) as date,
+        COUNT(*) as calls
+       FROM api_usage_logs
+       WHERE domain_id = $1
+       AND created_at >= NOW() - INTERVAL '7 days'
+       GROUP BY DATE(created_at)
+       ORDER BY date ASC`,
+      [domainId]
+    );
+
+    // Fill in missing days with 0
+    const stats: any[] = [];
+    const today = new Date();
+
+    for (let i = 6; i >= 0; i--) {
+      const date = new Date(today);
+      date.setDate(date.getDate() - i);
+      const dateStr = date.toISOString().split('T')[0];
+
+      const existing = result.rows.find(row => row.date.toISOString().split('T')[0] === dateStr);
+      stats.push({
+        date: dateStr,
+        calls: existing ? parseInt(existing.calls) : 0
+      });
+    }
+
+    return stats;
+  }
 }
 
 export default new DomainService();

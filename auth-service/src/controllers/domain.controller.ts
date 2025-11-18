@@ -184,6 +184,145 @@ export class DomainController {
       res.status(500).json({ error: 'Failed to get organization domains' });
     }
   }
+
+  // Callback URL Management
+  async getCallbacks(req: Request, res: Response) {
+    try {
+      const { id } = req.params;
+
+      const domain = await domainService.findById(id);
+      if (!domain) {
+        return res.status(404).json({ error: 'Domain not found' });
+      }
+
+      const callbacks = await domainService.getCallbacks(id);
+      res.json({ data: callbacks });
+    } catch (error: any) {
+      console.error('Get callbacks error:', error);
+      res.status(500).json({ error: 'Failed to get callbacks' });
+    }
+  }
+
+  async addCallback(req: Request, res: Response) {
+    try {
+      const { id } = req.params;
+      const { url } = req.body;
+
+      if (!url) {
+        return res.status(400).json({ error: 'URL is required' });
+      }
+
+      const domain = await domainService.findById(id);
+      if (!domain) {
+        return res.status(404).json({ error: 'Domain not found' });
+      }
+
+      // Validate URL format
+      try {
+        new URL(url);
+      } catch {
+        return res.status(400).json({ error: 'Invalid URL format' });
+      }
+
+      const callback = await domainService.addCallback(id, url);
+      res.status(201).json({
+        message: 'Callback URL added successfully',
+        data: callback,
+      });
+    } catch (error: any) {
+      console.error('Add callback error:', error);
+      res.status(500).json({ error: 'Failed to add callback URL' });
+    }
+  }
+
+  async deleteCallback(req: Request, res: Response) {
+    try {
+      const { id, callbackId } = req.params;
+
+      const domain = await domainService.findById(id);
+      if (!domain) {
+        return res.status(404).json({ error: 'Domain not found' });
+      }
+
+      await domainService.deleteCallback(callbackId);
+      res.json({ message: 'Callback URL deleted successfully' });
+    } catch (error: any) {
+      console.error('Delete callback error:', error);
+      res.status(500).json({ error: 'Failed to delete callback URL' });
+    }
+  }
+
+  // Client Secret Management
+  async regenerateSecret(req: Request, res: Response) {
+    try {
+      const { id } = req.params;
+
+      const domain = await domainService.findById(id);
+      if (!domain) {
+        return res.status(404).json({ error: 'Domain not found' });
+      }
+
+      const updatedDomain = await domainService.regenerateSecret(id);
+      res.json({
+        message: 'Client secret regenerated successfully',
+        data: updatedDomain,
+      });
+    } catch (error: any) {
+      console.error('Regenerate secret error:', error);
+      res.status(500).json({ error: 'Failed to regenerate client secret' });
+    }
+  }
+
+  // Connection Testing
+  async testConnection(req: Request, res: Response) {
+    try {
+      const { id } = req.params;
+
+      const domain = await domainService.findById(id);
+      if (!domain) {
+        return res.status(404).json({ error: 'Domain not found' });
+      }
+
+      // Basic validation checks
+      const checks = {
+        domain_active: domain.is_active,
+        has_client_id: !!domain.client_id,
+        has_client_secret: !!domain.client_secret,
+        domain_configured: !!domain.domain,
+      };
+
+      const allChecks = Object.values(checks).every((check) => check);
+
+      res.json({
+        success: allChecks,
+        message: allChecks
+          ? 'Domain configuration is valid and ready to use'
+          : 'Domain configuration has issues',
+        checks,
+      });
+    } catch (error: any) {
+      console.error('Test connection error:', error);
+      res.status(500).json({ error: 'Failed to test connection' });
+    }
+  }
+
+  // Usage Statistics
+  async getUsage(req: Request, res: Response) {
+    try {
+      const { id } = req.params;
+
+      const domain = await domainService.findById(id);
+      if (!domain) {
+        return res.status(404).json({ error: 'Domain not found' });
+      }
+
+      const usage = await domainService.getUsageStats(id);
+      res.json({ data: usage });
+    } catch (error: any) {
+      console.error('Get usage error:', error);
+      res.status(500).json({ error: 'Failed to get usage statistics' });
+    }
+  }
 }
 
 export default new DomainController();

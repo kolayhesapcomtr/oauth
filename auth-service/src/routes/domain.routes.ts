@@ -51,4 +51,30 @@ router.put(
 // Delete domain
 router.delete('/:id', validate([param('id').isUUID()]), domainController.delete);
 
+// Callback URL management
+router.get('/:id/callbacks', validate([param('id').isUUID()]), domainController.getCallbacks);
+router.post(
+  '/:id/callbacks',
+  validate([param('id').isUUID(), body('url').isURL()]),
+  domainController.addCallback
+);
+router.delete(
+  '/:id/callbacks/:callbackId',
+  validate([param('id').isUUID(), param('callbackId').isUUID()]),
+  domainController.deleteCallback
+);
+
+// Client secret management
+router.post(
+  '/:id/regenerate-secret',
+  validate([param('id').isUUID()]),
+  domainController.regenerateSecret
+);
+
+// Connection testing
+router.post('/:id/test-connection', validate([param('id').isUUID()]), domainController.testConnection);
+
+// Usage statistics
+router.get('/:id/usage', validate([param('id').isUUID()]), domainController.getUsage);
+
 export default router;

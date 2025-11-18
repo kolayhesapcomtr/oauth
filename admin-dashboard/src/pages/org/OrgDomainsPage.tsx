@@ -157,6 +157,187 @@ export default function OrgDomainsPage() {
           </button>
         </div>
       )}
+
+      {/* Create Domain Modal */}
+      {showCreateModal && (
+        <DomainCreateModal
+          organizationId={user?.organization_id || ''}
+          onClose={() => setShowCreateModal(false)}
+          onSuccess={() => {
+            setShowCreateModal(false);
+            loadDomains();
+          }}
+        />
+      )}
+    </div>
+  );
+}
+
+// Domain Create Modal Component
+function DomainCreateModal({
+  organizationId,
+  onClose,
+  onSuccess,
+}: {
+  organizationId: string;
+  onClose: () => void;
+  onSuccess: () => void;
+}) {
+  const [formData, setFormData] = useState({
+    name: '',
+    slug: '',
+    domain: '',
+    description: '',
+    logo_url: '',
+    is_active: true,
+  });
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState('');
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+    setSubmitting(true);
+
+    try {
+      await api.post('/domains', {
+        ...formData,
+        organization_id: organizationId,
+      });
+      onSuccess();
+    } catch (err: any) {
+      setError(err.response?.data?.error || 'Domain oluşturulamadı');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  // Auto-generate slug from name
+  const handleNameChange = (name: string) => {
+    setFormData({
+      ...formData,
+      name,
+      slug: name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''),
+    });
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+        <div className="p-6 border-b">
+          <h2 className="text-2xl font-bold text-gray-900">Yeni Domain Oluştur</h2>
+          <p className="text-gray-600 mt-1">OAuth entegrasyonu için yeni bir domain ekleyin</p>
+        </div>
+
+        <form onSubmit={handleSubmit} className="p-6 space-y-4">
+          {error && (
+            <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded">
+              {error}
+            </div>
+          )}
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Domain İsmi *
+            </label>
+            <input
+              type="text"
+              value={formData.name}
+              onChange={(e) => handleNameChange(e.target.value)}
+              required
+              placeholder="CRM Sistemi"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Slug *
+            </label>
+            <input
+              type="text"
+              value={formData.slug}
+              onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
+              required
+              placeholder="crm-sistemi"
+              pattern="[a-z0-9-]+"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            />
+            <p className="text-xs text-gray-500 mt-1">Sadece küçük harf, rakam ve tire kullanın</p>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Domain URL *
+            </label>
+            <input
+              type="text"
+              value={formData.domain}
+              onChange={(e) => setFormData({ ...formData, domain: e.target.value })}
+              required
+              placeholder="crm.sirketim.com"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            />
+            <p className="text-xs text-gray-500 mt-1">OAuth için kullanılacak domain adresi</p>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Açıklama
+            </label>
+            <textarea
+              value={formData.description}
+              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+              rows={3}
+              placeholder="Domain hakkında kısa açıklama..."
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Logo URL
+            </label>
+            <input
+              type="url"
+              value={formData.logo_url}
+              onChange={(e) => setFormData({ ...formData, logo_url: e.target.value })}
+              placeholder="https://sirketim.com/logo.png"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            />
+          </div>
+
+          <div className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              id="is_active"
+              checked={formData.is_active}
+              onChange={(e) => setFormData({ ...formData, is_active: e.target.checked })}
+              className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+            />
+            <label htmlFor="is_active" className="text-sm font-medium text-gray-700">
+              Aktif (Domain hemen kullanıma hazır olsun)
+            </label>
+          </div>
+
+          <div className="flex items-center gap-3 pt-4">
+            <button
+              type="submit"
+              disabled={submitting}
+              className="flex-1 bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 disabled:opacity-50 transition-colors"
+            >
+              {submitting ? 'Oluşturuluyor...' : 'Domain Oluştur'}
+            </button>
+            <button
+              type="button"
+              onClick={onClose}
+              className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+            >
+              İptal
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 }

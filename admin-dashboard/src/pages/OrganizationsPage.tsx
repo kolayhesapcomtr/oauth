@@ -23,6 +23,7 @@ export default function OrganizationsPage() {
   const [organizations, setOrganizations] = useState<Organization[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
+  const [showCreateModal, setShowCreateModal] = useState(false);
 
   useEffect(() => {
     loadOrganizations();
@@ -85,7 +86,10 @@ export default function OrganizationsPage() {
           <h1 className="text-3xl font-bold text-gray-900">Organizasyonlar</h1>
           <p className="text-gray-600 mt-1">Manage customer organizations</p>
         </div>
-        <button className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors flex items-center gap-2">
+        <button
+          onClick={() => setShowCreateModal(true)}
+          className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors flex items-center gap-2"
+        >
           <Plus className="h-4 w-4" />
           New Organization
         </button>
@@ -173,6 +177,205 @@ export default function OrganizationsPage() {
             ))}
           </tbody>
         </table>
+      </div>
+
+      {/* Create Organization Modal */}
+      {showCreateModal && (
+        <OrganizationCreateModal
+          onClose={() => setShowCreateModal(false)}
+          onSuccess={() => {
+            setShowCreateModal(false);
+            loadOrganizations();
+          }}
+        />
+      )}
+    </div>
+  );
+}
+
+// Organization Create Modal Component
+function OrganizationCreateModal({
+  onClose,
+  onSuccess,
+}: {
+  onClose: () => void;
+  onSuccess: () => void;
+}) {
+  const [formData, setFormData] = useState({
+    name: '',
+    slug: '',
+    owner_email: '',
+    billing_email: '',
+    plan: 'trial',
+  });
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState('');
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+    setSubmitting(true);
+
+    try {
+      await api.post('/organizations', formData);
+      onSuccess();
+    } catch (err: any) {
+      setError(err.response?.data?.error || 'Failed to create organization');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  // Auto-generate slug from name
+  const handleNameChange = (name: string) => {
+    setFormData({
+      ...formData,
+      name,
+      slug: name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''),
+    });
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+        <div className="p-6 border-b">
+          <h2 className="text-2xl font-bold text-gray-900">Yeni Organizasyon Oluştur</h2>
+          <p className="text-gray-600 mt-1">Sisteme yeni bir müşteri organizasyonu ekleyin</p>
+        </div>
+
+        <form onSubmit={handleSubmit} className="p-6 space-y-4">
+          {error && (
+            <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded">
+              {error}
+            </div>
+          )}
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Organizasyon Adı *
+            </label>
+            <input
+              type="text"
+              value={formData.name}
+              onChange={(e) => handleNameChange(e.target.value)}
+              required
+              placeholder="Acme Corporation"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Slug *
+            </label>
+            <input
+              type="text"
+              value={formData.slug}
+              onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
+              required
+              placeholder="acme-corporation"
+              pattern="[a-z0-9-]+"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+            />
+            <p className="text-xs text-gray-500 mt-1">Sadece küçük harf, rakam ve tire kullanın</p>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Sahip E-posta *
+            </label>
+            <input
+              type="email"
+              value={formData.owner_email}
+              onChange={(e) => setFormData({ ...formData, owner_email: e.target.value })}
+              required
+              placeholder="owner@acme.com"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+            />
+            <p className="text-xs text-gray-500 mt-1">Organizasyon yöneticisinin e-posta adresi</p>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Fatura E-posta
+            </label>
+            <input
+              type="email"
+              value={formData.billing_email}
+              onChange={(e) => setFormData({ ...formData, billing_email: e.target.value })}
+              placeholder="billing@acme.com"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+            />
+            <p className="text-xs text-gray-500 mt-1">Boş bırakılırsa sahip e-postası kullanılır</p>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Başlangıç Planı *
+            </label>
+            <select
+              value={formData.plan}
+              onChange={(e) => setFormData({ ...formData, plan: e.target.value })}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+            >
+              <option value="trial">Trial (14 günlük deneme)</option>
+              <option value="starter">Starter</option>
+              <option value="business">Business</option>
+              <option value="enterprise">Enterprise</option>
+            </select>
+          </div>
+
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <h4 className="font-medium text-blue-900 mb-2">Plan Limitleri</h4>
+            <div className="text-sm text-blue-700 space-y-1">
+              {formData.plan === 'trial' && (
+                <>
+                  <div>• 1 Domain, 10 Kiracı, 100 Kullanıcı</div>
+                  <div>• 10,000 API çağrısı/ay</div>
+                  <div>• 14 gün deneme süresi</div>
+                </>
+              )}
+              {formData.plan === 'starter' && (
+                <>
+                  <div>• 3 Domain, 50 Kiracı, 1,000 Kullanıcı</div>
+                  <div>• 100,000 API çağrısı/ay</div>
+                  <div>• Email destek</div>
+                </>
+              )}
+              {formData.plan === 'business' && (
+                <>
+                  <div>• 10 Domain, 200 Kiracı, 10,000 Kullanıcı</div>
+                  <div>• 1,000,000 API çağrısı/ay</div>
+                  <div>• Priority destek, SSO, Custom domain</div>
+                </>
+              )}
+              {formData.plan === 'enterprise' && (
+                <>
+                  <div>• Sınırsız Domain, Kiracı ve Kullanıcı</div>
+                  <div>• Sınırsız API çağrısı</div>
+                  <div>• Tam destek, White-label, SLA</div>
+                </>
+              )}
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3 pt-4">
+            <button
+              type="submit"
+              disabled={submitting}
+              className="flex-1 bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 disabled:opacity-50 transition-colors"
+            >
+              {submitting ? 'Oluşturuluyor...' : 'Organizasyon Oluştur'}
+            </button>
+            <button
+              type="button"
+              onClick={onClose}
+              className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+            >
+              İptal
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   );
